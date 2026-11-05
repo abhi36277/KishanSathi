@@ -13,7 +13,7 @@
       "longitude": 76.8967,
       "is_demo": true,
       "created_at": "2026-11-05T10:47:32.102Z",
-      "session_token": "session-5d3961f9-fe95-4f84-8a0c-065fe376f28c"
+      "session_token": "session-01bc25d2-6960-4051-ae5e-fccef9756c1f"
     },
     {
       "id": "00000000-0000-0000-0000-000000000004",
@@ -58,6 +58,22 @@
       "longitude": 75.857,
       "is_demo": false,
       "created_at": "2026-11-05T18:14:27.162Z"
+    },
+    {
+      "id": "5fffd732-27ee-4072-bfe5-0978ad002251",
+      "auth_user_id": "0baf4f86-c41a-45a2-a43a-7867a54aa486",
+      "name": "Arjun Verma",
+      "phone": "+919816518243",
+      "password_hash": "d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1",
+      "session_token": "session-f50e774a-e937-4e2a-b8e6-c3091409accb",
+      "state": "Punjab",
+      "district": "Ludhiana",
+      "village": "Samrala",
+      "language": "hi",
+      "latitude": 30.901,
+      "longitude": 75.857,
+      "is_demo": false,
+      "created_at": "2026-11-05T18:28:11.147Z"
     }
   ],
   "farms": [
@@ -88,6 +104,13 @@
       "area_acres": 3.5,
       "soil_type": "Alluvial Loam",
       "created_at": "2026-11-05T18:14:27.162Z"
+    },
+    {
+      "id": "b64a3776-a47b-4d7e-9741-d339b0b9607f",
+      "farmer_id": "5fffd732-27ee-4072-bfe5-0978ad002251",
+      "area_acres": 3.5,
+      "soil_type": "Alluvial Loam",
+      "created_at": "2026-11-05T18:28:11.147Z"
     }
   ],
   "crops": [
@@ -126,6 +149,15 @@
       "variety": "Standard High-Yield Variety",
       "growth_stage": "Germination & Early Vegetative",
       "created_at": "2026-11-05T18:14:27.162Z"
+    },
+    {
+      "id": "16854a57-2a14-4ea3-b652-7a301d568514",
+      "farmer_id": "5fffd732-27ee-4072-bfe5-0978ad002251",
+      "crop_name": "Wheat",
+      "sowing_date": "2026-10-20",
+      "variety": "Standard High-Yield Variety",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T18:28:11.147Z"
     }
   ],
   "action_plans": [
@@ -204,6 +236,20 @@
       "role": "assistant",
       "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
       "created_at": "2026-11-05T18:14:28.752Z"
+    },
+    {
+      "id": "340e6f8d-bdd7-4c05-b8d8-85d1451dd195",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "user",
+      "message": "When should I irrigate next?",
+      "created_at": "2026-11-05T18:28:12.845Z"
+    },
+    {
+      "id": "42666e9f-e8e8-44fd-9ffb-cf2ef0719b6d",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "assistant",
+      "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
+      "created_at": "2026-11-05T18:28:12.845Z"
     }
   ],
   "disease_reports": [],
@@ -262,5 +308,5 @@
       "created_at": "2026-11-05T10:47:32.102Z"
     }
   ],
-  "last_saved_at": "2026-11-05T18:14:28.752Z"
+  "last_saved_at": "2026-11-05T18:28:12.845Z"
 }

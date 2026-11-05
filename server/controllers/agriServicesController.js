@@ -3,11 +3,12 @@ import { predictMandiPrices } from '../services/pricePredictorML.js';
 import { calculateFullCropLifecycle } from '../services/cropLifecycleML.js';
 import { calculatePestRadar, reportPestOutbreak } from '../services/pestRadarML.js';
 import { fetchWeatherData } from '../services/weatherService.js';
+import { callPythonML } from '../services/pythonMLBridge.js';
 import { localStore, isSupabaseConfigured, supabase } from '../config/db.js';
 import crypto from 'crypto';
 
 /**
- * 1. Disease Identification Pipeline (ML Model 1)
+ * 1. Disease Identification Pipeline (Python ML Microservice with local fallback)
  */
 export async function identifyDisease(req, res) {
   try {
@@ -19,12 +20,25 @@ export async function identifyDisease(req, res) {
       if (farmer?.state) farmerLocation = farmer.state;
     }
 
-    const result = await identifyPlantDisease({
-      cropName: crop_name || 'Rice (Paddy)',
+    // Try Python ML Microservice first
+    let result = null;
+    const pyRes = await callPythonML('/ml/disease/identify', 'POST', {
+      crop_name: crop_name || 'Rice (Paddy)',
       symptoms: symptoms || '',
-      imageBase64: image_base64 || null,
-      farmerLocation
+      image_base64: image_base64 || null,
+      location: farmerLocation
     });
+
+    if (pyRes.success && pyRes.data) {
+      result = pyRes.data;
+    } else {
+      result = await identifyPlantDisease({
+        cropName: crop_name || 'Rice (Paddy)',
+        symptoms: symptoms || '',
+        imageBase64: image_base64 || null,
+        farmerLocation
+      });
+    }
 
     // Save report in farmer history
     if (farmerId) {
@@ -36,7 +50,7 @@ export async function identifyDisease(req, res) {
         prediction: result.diagnosis?.disease_name,
         confidence: result.diagnosis?.confidence,
         symptoms: symptoms || 'Visual foliage scan',
-        recommendations: result.diagnosis?.organic_treatment + ' | ' + result.diagnosis?.chemical_guidelines,
+        recommendations: (result.diagnosis?.organic_treatment || '') + ' | ' + (result.diagnosis?.chemical_guidelines || ''),
         created_at: new Date().toISOString()
       };
 
@@ -60,14 +74,18 @@ export async function identifyDisease(req, res) {
 }
 
 /**
- * 2. Mandi Market Prices & 7-Day Trend Prediction (ML Model 2)
+ * 2. Mandi Market Prices & 7-Day Trend Prediction (Python ML Microservice with local fallback)
  */
 export async function getMarketPrices(req, res) {
   try {
-    const { state, district, crop } = req.query;
+    const { state = 'Karnataka', crop = 'Rice' } = req.query;
 
-    const priceResult = await predictMandiPrices({ state, district, crop });
+    const pyRes = await callPythonML(`/ml/prices/predict?state=${encodeURIComponent(state)}&crop=${encodeURIComponent(crop)}`);
+    if (pyRes.success && pyRes.data) {
+      return res.json({ success: true, data: pyRes.data, error: null });
+    }
 
+    const priceResult = await predictMandiPrices({ state, crop });
     return res.json({
       success: true,
       data: priceResult,
@@ -80,7 +98,7 @@ export async function getMarketPrices(req, res) {
 }
 
 /**
- * 3. Full Crop Lifecycle Tracker: Sowing, Irrigation, Fertilizer (ML Model 3)
+ * 3. Full Crop Lifecycle Tracker: Sowing, Irrigation, Fertilizer (Python ML Microservice with local fallback)
  */
 export async function getCropLifecycle(req, res) {
   try {
@@ -94,6 +112,19 @@ export async function getCropLifecycle(req, res) {
         success: false,
         data: null,
         error: 'No active crop found for this farmer. Please add a crop first.'
+      });
+    }
+
+    const pyRes = await callPythonML(`/ml/lifecycle/calculate?crop=${encodeURIComponent(crop.crop_name)}&sowing_date=${encodeURIComponent(crop.sowing_date)}`);
+    if (pyRes.success && pyRes.data) {
+      return res.json({
+        success: true,
+        data: {
+          crop,
+          farmer_name: farmer?.name,
+          lifecycle: pyRes.data
+        },
+        error: null
       });
     }
 
@@ -119,7 +150,7 @@ export async function getCropLifecycle(req, res) {
 }
 
 /**
- * 4. Geospatial Pest Radar by Location API & Micro-climate Alert Map (ML Model 4)
+ * 4. Geospatial Pest Radar by Location API & Micro-climate Alert Map (Python ML Microservice with local fallback)
  */
 export async function getPestRadar(req, res) {
   try {
@@ -137,20 +168,27 @@ export async function getPestRadar(req, res) {
     }
 
     if (isNaN(latitude) || isNaN(longitude)) {
-      latitude = 12.5238; // Default Mandya center
+      latitude = 12.5238;
       longitude = 76.8967;
     }
 
-    // Fetch micro-climate weather telemetry
+    // Micro-climate telemetry
     let weather = null;
     try {
       weather = await fetchWeatherData(latitude, longitude);
     } catch (e) {
-      console.warn('Weather fetch for pest radar skipped/fallback');
+      // ignore
+    }
+
+    const humidity = weather?.current?.humidity ?? 78.0;
+    const temp = weather?.current?.temperature ?? 26.5;
+
+    const pyRes = await callPythonML(`/ml/radar/scan?lat=${latitude}&lon=${longitude}&humidity=${humidity}&temp=${temp}`);
+    if (pyRes.success && pyRes.data) {
+      return res.json({ success: true, data: pyRes.data, error: null });
     }
 
     const radarResult = await calculatePestRadar({ latitude, longitude, weather });
-
     return res.json({
       success: true,
       data: radarResult,

@@ -98,10 +98,22 @@ export default function MarketPricesPage() {
           >
             <option value="Rice (Paddy)">Rice / Paddy (ಭತ್ತ / धान)</option>
             <option value="Wheat">Wheat (ಗೋಧಿ / गेहूं)</option>
-            <option value="Maize">Maize (ಮೆಕ್ಕೆಜೋಳ / मक्का)</option>
+            <option value="Maize">Maize / Corn (ಮೆಕ್ಕೆಜೋಳ / मक्का)</option>
             <option value="Tomatoes">Tomatoes (ಟೊಮ್ಯಾಟೊ / टमाटर)</option>
-            <option value="Chillies">Chillies (ಮೆಣಸಿನಕಾಯಿ / मिर्च)</option>
             <option value="Onions">Onions (ಈರುಳ್ಳಿ / प्याज)</option>
+            <option value="Potato">Potato (ಆಲೂಗಡ್ಡೆ / आलू)</option>
+            <option value="Chillies">Chillies (ಮೆಣಸಿನಕಾಯಿ / मिर्च)</option>
+            <option value="Cotton">Cotton (ಹತ್ತಿ / कपास)</option>
+            <option value="Mustard">Mustard (ಸಾಸಿವೆ / सरसों)</option>
+            <option value="Soyabean">Soyabean (ಸೋಯಾಬೀನ್ / सोयाबीन)</option>
+            <option value="Bengal Gram">Bengal Gram / Chana (ಕಡಲೆ / चना)</option>
+            <option value="Red Gram / Tur">Red Gram / Tur / Arhar (ತೊಗರಿ / अरहर / दाल)</option>
+            <option value="Groundnut">Groundnut / Peanut (ಕಡಲೆಕಾಯಿ / मूंगफली)</option>
+            <option value="Garlic">Garlic (ಬೆಳ್ಳುಳ್ಳಿ / लहसुन)</option>
+            <option value="Turmeric">Turmeric (ಅರಿಶಿನ / हल्दी)</option>
+            <option value="Bajra">Bajra / Pearl Millet (ಸಜ್ಜೆ / बाजरा)</option>
+            <option value="Jowar">Jowar / Sorghum (ಜೋಳ / ज्वार)</option>
+            <option value="Ragi">Ragi / Finger Millet (ರಾಗಿ / रागी)</option>
           </select>
         </div>
       </div>

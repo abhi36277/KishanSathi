@@ -249,28 +249,36 @@ export async function predictMandiPrices({ state, district, crop }) {
       if (resp.ok) {
         const json = await resp.json();
         if (json.records && json.records.length > 0) {
-          liveRecords = json.records.map((r, i) => {
-            const modal = parseFloat(r.modal_price) || 2200;
-            const min = parseFloat(r.min_price) || Math.round(modal * 0.92);
-            const max = parseFloat(r.max_price) || Math.round(modal * 1.08);
-            const dist = 15 + (i * 12) % 90;
-            return {
-              state: r.state || state || 'India',
-              district: r.district || district || 'District',
-              mandi_name: r.market ? `${r.market} APMC` : 'Regional Mandi',
-              crop: r.commodity || crop || 'Crop',
-              variety: r.variety || 'Standard FAQ',
-              modal_price: modal,
-              min_price: min,
-              max_price: max,
-              arrival_quintals: Math.round(modal * 3.5),
-              distance_km: dist,
-              date: r.arrival_date || new Date().toISOString().split('T')[0],
-              trend: modal > 2500 ? 'Bullish' : modal < 1800 ? 'Bearish' : 'Stable',
-              is_live_ogd: true
-            };
+          const cleanCropLow = (crop || '').toLowerCase().trim();
+          const validLive = json.records.filter(r => {
+            const rc = (r.commodity || '').toLowerCase();
+            return rc.includes(cleanCropLow) || cleanCropLow.includes(rc) || rc.includes('paddy') || rc.includes('wheat');
           });
-          isLiveGovFeed = true;
+
+          if (validLive.length > 0) {
+            liveRecords = validLive.map((r, i) => {
+              const modal = parseFloat(r.modal_price) || 2200;
+              const min = parseFloat(r.min_price) || Math.round(modal * 0.92);
+              const max = parseFloat(r.max_price) || Math.round(modal * 1.08);
+              const dist = 15 + (i * 12) % 90;
+              return {
+                state: r.state || state || 'India',
+                district: r.district || district || 'District',
+                mandi_name: r.market ? `${r.market} APMC` : 'Regional Mandi',
+                crop: r.commodity || crop || 'Crop',
+                variety: r.variety || 'Standard FAQ',
+                modal_price: modal,
+                min_price: min,
+                max_price: max,
+                arrival_quintals: Math.round(modal * 3.5),
+                distance_km: dist,
+                date: r.arrival_date || new Date().toISOString().split('T')[0],
+                trend: modal > 2500 ? 'Bullish' : modal < 1800 ? 'Bearish' : 'Stable',
+                is_live_ogd: true
+              };
+            });
+            isLiveGovFeed = true;
+          }
         }
       }
     } catch (e) {

@@ -19,11 +19,15 @@ export default function DiseaseIdentificationPage() {
     'Yellowing leaves (Chlorosis)',
     'Brown spindle spots with grey center',
     'Deadhearts in central shoot',
-    'White cottony mold on leaf underside',
-    'Curled puckered leaves',
-    'Black sunken spots on fruit',
-    'Linear yellow stripes',
-    'Wilting despite moist soil'
+    'White powdery patches on leaves',
+    'Curled puckered leaves (Leaf Curl)',
+    'Downward curling & bronze underside (Mites)',
+    'Upward boat-shaped curl (Thrips)',
+    'Ragged leaf holes & whorl frass (Fall Armyworm)',
+    'Water-soaked dark lesions (Late Blight)',
+    'Black sunken spots on fruit (Anthracnose)',
+    'Linear yellow stripes (Stripe Rust)',
+    'Wilting shoots & fruit borer holes'
   ];
 
   const handleToggleSymptom = (tag) => {
@@ -143,6 +147,11 @@ export default function DiseaseIdentificationPage() {
                 <option value="Maize">Maize (ಮೆಕ್ಕೆಜೋಳ / मक्का)</option>
                 <option value="Tomatoes">Tomatoes (ಟೊಮ್ಯಾಟೊ / टमाटर)</option>
                 <option value="Chillies">Chillies (ಮೆಣಸಿನಕಾಯಿ / मिर्च)</option>
+                <option value="Potato">Potato (ಆಲೂಗಡ್ಡೆ / आलू)</option>
+                <option value="Brinjal">Brinjal / Eggplant (ಬದನೆಕಾಯಿ / बैंगन)</option>
+                <option value="Cotton">Cotton (ಹತ್ತಿ / कपास)</option>
+                <option value="Mustard">Mustard (ಸಾಸಿವೆ / सरसों)</option>
+                <option value="Bean">Beans / Pulses (ಹುರುಳಿ / दाल / फलियां)</option>
               </select>
             </div>
 

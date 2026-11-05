@@ -16,7 +16,7 @@ try:
 except ImportError:
     genai = None
 
-# Verified ICAR & State Agricultural University plant pathology knowledge base
+# Verified ICAR & Digital Green Indian plant pathology knowledge base
 PATHOLOGY_KNOWLEDGE_BASE = {
     "rice": [
         {
@@ -80,6 +80,120 @@ PATHOLOGY_KNOWLEDGE_BASE = {
             "cultural_practices": "Avoid excessive nitrogen which promotes dense succulent canopy.",
             "chemical_guidelines": "Tebuconazole 25.9% EC as per recommended local rate.",
             "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        },
+        {
+            "keywords": ["nitrogen", "chlorosis", "pale yellow", "deficiency"],
+            "disease_name": "Wheat Nitrogen (N) Deficiency",
+            "pathogen_type": "Nutrient Deficiency",
+            "severity": "Moderate",
+            "confidence": 90,
+            "symptoms": "Uniform yellowing starting from bottom leaf tips upward, slow tillering and pale stunted growth.",
+            "organic_treatment": "Apply well-decomposed FYM or vermicompost with Azotobacter.",
+            "cultural_practices": "Split nitrogen dressing into basal, CRI, and first node stage.",
+            "chemical_guidelines": "Top dress Neem-coated urea @ 25 kg/acre or spray 2% urea solution foliar.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        }
+    ],
+    "maize": [
+        {
+            "keywords": ["fall armyworm", "armyworm", "whorl", "ragged hole", "frass", "sawdust"],
+            "disease_name": "Fall Armyworm (Spodoptera frugiperda)",
+            "pathogen_type": "Insect Pest",
+            "severity": "Critical",
+            "confidence": 96,
+            "symptoms": "Extensive ragged papery holes on leaves; heavy accumulation of fresh yellowish sawdust-like frass inside the central leaf whorl.",
+            "organic_treatment": "Application of sand + wood ash (9:1) into whorls. Spray Bacillus thuringiensis (Bt) @ 2g/L or Metarhizium anisopliae.",
+            "cultural_practices": "Intercrop with cowpea or pulses. Install pheromone traps @ 5/acre.",
+            "chemical_guidelines": "Chlorantraniliprole 18.5% SC @ 0.4 ml/L or Emamectin Benzoate 5% SG @ 0.4 g/L directed into central whorl.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        },
+        {
+            "keywords": ["turcicum", "leaf blight", "spindle", "cigar", "greyish green"],
+            "disease_name": "Turcicum Leaf Blight (Exserohilum turcicum)",
+            "pathogen_type": "Fungal",
+            "severity": "Severe",
+            "confidence": 91,
+            "symptoms": "Long, elliptical, spindle or cigar-shaped greenish-grey lesions on leaf blades spreading from lower to upper canopy.",
+            "organic_treatment": "Spray Trichoderma harzianum @ 5g/L or 5% Neem Seed Kernel Extract (NSKE).",
+            "cultural_practices": "Avoid high plant densities. Burn or bury infected crop residues after harvest.",
+            "chemical_guidelines": "Mancozeb 75% WP @ 2.5 g/L or Azoxystrobin + Difenoconazole SC.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        }
+    ],
+    "potato": [
+        {
+            "keywords": ["late blight", "water soaked", "black lesion", "white mold", "blight"],
+            "disease_name": "Potato Late Blight (Phytophthora infestans)",
+            "pathogen_type": "Oomycete / Water Mold",
+            "severity": "Critical",
+            "confidence": 96,
+            "symptoms": "Rapidly expanding water-soaked dark brown/black lesions on leaf margins and stems; delicate white downy mold underneath in humid conditions.",
+            "organic_treatment": "Preventative spray of Copper oxychloride 50% WP @ 2.5 g/L or Bordeaux mixture 1%. Destroy infected haulms.",
+            "cultural_practices": "Plant certified disease-free seed tubers (Kufri Jyoti). Ensure proper hilling-up.",
+            "chemical_guidelines": "Metalaxyl 8% + Mancozeb 64% WP @ 2 g/L or Cymoxanil + Mancozeb.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        },
+        {
+            "keywords": ["calcium", "deficiency", "curling up", "leaf tip burnt"],
+            "disease_name": "Potato Calcium (Ca) Deficiency",
+            "pathogen_type": "Nutrient Deficiency",
+            "severity": "Moderate",
+            "confidence": 89,
+            "symptoms": "Younger apical leaves remain small, curl upwards, and show necrotic brown/burned margins.",
+            "organic_treatment": "Apply gypsum @ 100 kg/acre or dolomite lime according to soil test.",
+            "cultural_practices": "Maintain uniform soil moisture; avoid dry spells followed by flooding.",
+            "chemical_guidelines": "Foliar spray of Calcium Nitrate @ 5g/L during rapid vegetative growth.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        }
+    ],
+    "chillies": [
+        {
+            "keywords": ["leaf curl", "curl", "crinkled", "puckered", "stunted", "whitefly", "clcv"],
+            "disease_name": "Chilli Leaf Curl Virus (CLCV)",
+            "pathogen_type": "Viral (Whitefly vector)",
+            "severity": "Severe",
+            "confidence": 94,
+            "symptoms": "Upward curling and puckering of leaves, thickening and leathery texture of leaf lamina, severe shortening of internodes and stunted growth.",
+            "organic_treatment": "Install 15-20 yellow sticky traps/acre. Spray Neem oil (10,000 ppm) @ 3 ml/L or 5% NSKE every 10 days.",
+            "cultural_practices": "Grow 2-3 barrier rows of maize or sorghum around chilli fields. Rogue out and burn heavily infected plants.",
+            "chemical_guidelines": "Control vector whiteflies with Diafenthiuron 50% WP @ 1.25 g/L or Thiamethoxam 25% WG @ 0.3 g/L.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        },
+        {
+            "keywords": ["thrips", "boat shape", "rasping", "crinkling"],
+            "disease_name": "Chilli Thrips Infestation (Scirtothrips dorsalis)",
+            "pathogen_type": "Insect Pest",
+            "severity": "Severe",
+            "confidence": 93,
+            "symptoms": "Upward boat-shaped curling of leaves, brownish rasping marks along veins on leaf underside, distorted small buds.",
+            "organic_treatment": "Install blue sticky traps @ 20/acre. Spray Karanj oil @ 3ml/L or Verticillium lecanii @ 5g/L.",
+            "cultural_practices": "Provide frequent light irrigations; avoid water stress which accelerates thrips multiplication.",
+            "chemical_guidelines": "Spinosad 45% SC @ 0.3 ml/L or Fipronil 5% SC @ 1.5 ml/L.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        },
+        {
+            "keywords": ["mites", "downward curl", "inverted boat", "bronze underside"],
+            "disease_name": "Yellow Mite / Broad Mite (Polyphagotarsonemus latus)",
+            "pathogen_type": "Acarine Pest",
+            "severity": "Severe",
+            "confidence": 92,
+            "symptoms": "Downward curling of leaves resembling an inverted boat, leaves turn dark green with a glossy or bronze under-surface.",
+            "organic_treatment": "Spray Wettable Sulphur 80% WP @ 3g/L or garlic-chilli extract.",
+            "cultural_practices": "Avoid broad-spectrum synthetic pyrethroids which wipe out natural predatory mites.",
+            "chemical_guidelines": "Spiromesifen 22.9% SC @ 1 ml/L or Fenpyroximate 5% EC @ 1 ml/L.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        },
+        {
+            "keywords": ["anthracnose", "dieback", "fruit rot", "sunken spot", "black dot"],
+            "disease_name": "Chilli Anthracnose & Dieback (Colletotrichum capsici)",
+            "pathogen_type": "Fungal",
+            "severity": "Severe",
+            "confidence": 91,
+            "symptoms": "Circular sunken necrotic lesions on ripe chillies with concentric rings of black fungal dots; twigs wither downwards.",
+            "organic_treatment": "Seed treatment with Trichoderma viride @ 4g/kg seed. Spray 1% Bordeaux mixture on green pods.",
+            "cultural_practices": "Collect and destroy fallen infected pods. Avoid overhead irrigation during fruiting phase.",
+            "chemical_guidelines": "Azoxystrobin 23% SC @ 1 ml/L or Difenoconazole 25% EC @ 0.5 ml/L.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
         }
     ],
     "tomatoes": [
@@ -93,6 +207,74 @@ PATHOLOGY_KNOWLEDGE_BASE = {
             "organic_treatment": "Copper oxychloride 50% WP or Bordeaux mixture 1%. Remove and burn infected lower leaves.",
             "cultural_practices": "Use drip irrigation; avoid wetting canopy with overhead sprinklers. Stake plants for aeration.",
             "chemical_guidelines": "Metalaxyl + Mancozeb 64% WP applied at earliest onset.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        },
+        {
+            "keywords": ["curl", "whitefly", "stunted", "crinkled", "puckered", "tolcv"],
+            "disease_name": "Tomato Leaf Curl Virus (ToLCV)",
+            "pathogen_type": "Viral (Begomovirus / Whitefly vector)",
+            "severity": "Severe",
+            "confidence": 93,
+            "symptoms": "Upward or downward rolling and curling of leaves, thickened puckered veins, severe plant stunting, and reduced fruit set.",
+            "organic_treatment": "Install yellow sticky traps (15-20 traps/acre). Spray Neem oil (10,000 ppm) @ 3ml/L.",
+            "cultural_practices": "Erect barrier rows of maize/sorghum. Rogue out severely infected plants.",
+            "chemical_guidelines": "Thiamethoxam 25% WG or Diafenthiuron 50% WP to control whiteflies.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        }
+    ],
+    "brinjal": [
+        {
+            "keywords": ["shoot borer", "fruit borer", "borer", "drooping shoot", "hole in fruit"],
+            "disease_name": "Brinjal Shoot and Fruit Borer (Leucinodes orbonalis)",
+            "pathogen_type": "Insect Pest",
+            "severity": "Critical",
+            "confidence": 95,
+            "symptoms": "Withering and drooping of tender terminal shoots ('Deadhearts'); round holes plugged with frass in fruits.",
+            "organic_treatment": "Clip drooping shoots weekly. Install Lucin-lure pheromone traps @ 12/acre. Spray Bt @ 2g/L.",
+            "cultural_practices": "Avoid continuous solanaceous cropping. Handpick and destroy infested fruits.",
+            "chemical_guidelines": "Chlorantraniliprole 18.5% SC @ 0.4 ml/L or Spinosad 45% SC @ 0.3 ml/L.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        }
+    ],
+    "cotton": [
+        {
+            "keywords": ["aphids", "jassids", "curling", "hopper burn"],
+            "disease_name": "Cotton Sucking Pest Complex (Aphids & Jassids)",
+            "pathogen_type": "Insect Pest",
+            "severity": "Severe",
+            "confidence": 93,
+            "symptoms": "Downwards curling and crinkling of leaves, marginal yellowing turning reddish-brown ('Hopper burn').",
+            "organic_treatment": "Spray 5% NSKE or Neem oil (1500 ppm) @ 5ml/L. Release Chrysoperla carnea.",
+            "cultural_practices": "Intercrop with cowpea or green gram. Avoid excessive nitrogen fertilizer.",
+            "chemical_guidelines": "Flonicamid 50% WG @ 0.3 g/L or Dinotefuran 20% SG @ 0.3 g/L.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        }
+    ],
+    "mustard": [
+        {
+            "keywords": ["aphids", "colony", "sap sucking", "curled leaf"],
+            "disease_name": "Mustard Aphid (Lipaphis erysimi)",
+            "pathogen_type": "Insect Pest",
+            "severity": "Severe",
+            "confidence": 95,
+            "symptoms": "Dense colonies of small greenish-black aphids coating inflorescence, pods, and tender shoots; stunting of plant tops.",
+            "organic_treatment": "Spray 5% Neem Seed Kernel Extract (NSKE) or Verticillium lecanii @ 5g/L.",
+            "cultural_practices": "Sow early (Oct 10-25) to escape peak aphid flight.",
+            "chemical_guidelines": "Dimethoate 30% EC @ 1 ml/L or Oxydemeton-methyl 25% EC @ 1 ml/L.",
+            "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
+        }
+    ],
+    "bean": [
+        {
+            "keywords": ["powdery mildew", "white powder", "talcum", "patches"],
+            "disease_name": "Bean Powdery Mildew (Erysiphe polygoni)",
+            "pathogen_type": "Fungal",
+            "severity": "Severe",
+            "confidence": 94,
+            "symptoms": "White talcum-like powdery fungal patches on upper surface of leaves, stems, and pods.",
+            "organic_treatment": "Spray Wettable Sulphur 80% WP @ 2.5 g/L or 10% cow milk solution.",
+            "cultural_practices": "Ensure adequate spacing for morning sunlight penetration.",
+            "chemical_guidelines": "Hexaconazole 5% EC @ 1 ml/L or Dinocap 48% EC @ 1 ml/L.",
             "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
         }
     ]
@@ -225,10 +407,19 @@ def diagnose_crop_disease(
     combined_symptoms = f"{symptoms_lower} {' '.join(visual_clues)}".strip()
 
     # Search crop-specific pathology database
-    candidates = PATHOLOGY_KNOWLEDGE_BASE.get(
-        "wheat" if "wheat" in crop_key else "tomatoes" if "tomato" in crop_key else "chillies" if "chilli" in crop_key else "rice",
-        PATHOLOGY_KNOWLEDGE_BASE["rice"]
+    crop_category = (
+        "wheat" if "wheat" in crop_key else
+        "tomatoes" if "tomato" in crop_key else
+        "chillies" if "chilli" in crop_key or "mirch" in crop_key or "pepper" in crop_key else
+        "maize" if "maize" in crop_key or "corn" in crop_key else
+        "potato" if "potato" in crop_key or "aloo" in crop_key else
+        "brinjal" if "brinjal" in crop_key or "eggplant" in crop_key or "baingan" in crop_key else
+        "cotton" if "cotton" in crop_key or "kapas" in crop_key else
+        "mustard" if "mustard" in crop_key or "sarson" in crop_key else
+        "bean" if "bean" in crop_key or "pulse" in crop_key or "gram" in crop_key or "pea" in crop_key else
+        "rice"
     )
+    candidates = PATHOLOGY_KNOWLEDGE_BASE.get(crop_category, PATHOLOGY_KNOWLEDGE_BASE["rice"])
 
     best_match = None
     max_score = 0

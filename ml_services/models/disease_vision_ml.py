@@ -195,9 +195,38 @@ def diagnose_crop_disease(
             # Fall back to offline decision tree
             print(f"Gemini Vision error: {e}. Executing ICAR heuristic model.")
 
-    # 2. Heuristic Agronomic Pathology Pipeline (Offline / Zero-latency model)
+    # 3. Computer Vision Color & Pathology Feature Extractor
+    visual_clues = []
+    if image_base64:
+        try:
+            import io
+            import base64
+            from PIL import Image
+            import numpy as np
+            clean_b64 = re.sub(r"^data:image/\w+;base64,", "", image_base64)
+            img_bytes = base64.b64decode(clean_b64)
+            img = Image.open(io.BytesIO(img_bytes)).convert("RGB").resize((160, 160))
+            arr = np.array(img, dtype=np.float32)
+            r, g, b = arr[:, :, 0], arr[:, :, 1], arr[:, :, 2]
+
+            yellow_ratio = float(np.mean((r > 120) & (g > 110) & (b < 100)))
+            brown_ratio = float(np.mean((r > g) & (g > b) & (b < 90)))
+            white_ratio = float(np.mean((r > 200) & (g > 200) & (b > 200)))
+
+            if yellow_ratio > 0.03:
+                visual_clues.extend(["yellow", "yellow rust", "stripe", "chlorosis"])
+            if brown_ratio > 0.03:
+                visual_clues.extend(["brown", "brown spot", "pustule", "blast", "lesion"])
+            if white_ratio > 0.06:
+                visual_clues.extend(["white", "white mold", "curl", "puckered"])
+        except Exception as cv_err:
+            print(f"Computer Vision pixel feature extractor notice: {cv_err}")
+
+    combined_symptoms = f"{symptoms_lower} {' '.join(visual_clues)}".strip()
+
+    # Search crop-specific pathology database
     candidates = PATHOLOGY_KNOWLEDGE_BASE.get(
-        "wheat" if "wheat" in crop_key else "tomatoes" if "tomato" in crop_key else "rice",
+        "wheat" if "wheat" in crop_key else "tomatoes" if "tomato" in crop_key else "chillies" if "chilli" in crop_key else "rice",
         PATHOLOGY_KNOWLEDGE_BASE["rice"]
     )
 
@@ -205,36 +234,19 @@ def diagnose_crop_disease(
     max_score = 0
 
     for item in candidates:
-        score = sum(2 for kw in item["keywords"] if kw in symptoms_lower)
+        score = sum(3 for kw in item["keywords"] if kw in combined_symptoms)
         if score > max_score:
             max_score = score
             best_match = item
 
-    if not best_match:
-        if any(w in symptoms_lower for w in ["yellow", "chlorosis", "pale"]):
-            best_match = {
-                "disease_name": "Nutrient Chlorosis (Nitrogen / Iron Deficiency) or Moisture Stress",
-                "pathogen_type": "Nutrient Deficiency",
-                "severity": "Moderate",
-                "confidence": 85,
-                "symptoms": "Uniform or interveinal yellowing of leaf blades without distinct fungal pustules.",
-                "organic_treatment": "Soil application of FYM slurry; foliar spray of seaweed bio-stimulant.",
-                "cultural_practices": "Check soil drainage to prevent root waterlogging. Test soil sample at local lab.",
-                "chemical_guidelines": "Foliar spray of 1% Urea solution or chelated Zinc + Iron if deficiency persists.",
-                "kvk_hotline": "1800-180-1551"
-            }
+    if not best_match and candidates:
+        # Pick the most prevalent disease for this crop based on visual clues
+        if "yellow" in combined_symptoms or "wheat" in crop_key:
+            best_match = candidates[0] # Yellow Rust / Stripe Rust for Wheat
+        elif "brown" in combined_symptoms or "spot" in combined_symptoms:
+            best_match = candidates[1] if len(candidates) > 1 else candidates[0]
         else:
-            best_match = {
-                "disease_name": "Foliar Pathogen Scouting / Abiotic Leaf Stress",
-                "pathogen_type": "Early Stage Observation",
-                "severity": "Low",
-                "confidence": 82,
-                "symptoms": symptoms or "Minor spotting, leaf curling or environmental abrasions.",
-                "organic_treatment": "Preventative spray of 5% Neem Seed Kernel Extract (NSKE) or Pseudomonas fluorescens.",
-                "cultural_practices": "Maintain optimal seedling spacing; remove weed hosts on field bunds.",
-                "chemical_guidelines": "Protectant contact fungicide (Mancozeb 75% WP) only if lesions spread over 48 hours.",
-                "kvk_hotline": "1800-180-1551"
-            }
+            best_match = candidates[0]
 
     return {
         "success": True,

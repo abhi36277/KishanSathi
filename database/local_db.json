@@ -234,6 +234,22 @@
       "longitude": 75.857,
       "is_demo": false,
       "created_at": "2026-11-05T20:56:18.493Z"
+    },
+    {
+      "id": "eb2992ab-9ea5-4f35-8bf3-308c79861030",
+      "auth_user_id": "3f3a18b5-7f26-4d90-b0d2-6f9140401d11",
+      "name": "aaa",
+      "phone": "+919876567890",
+      "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+      "session_token": "session-fd417552-9878-4e32-a008-3e8a03da4fc9",
+      "state": "Karnataka",
+      "district": "Bengaluru Urban",
+      "village": "Bgs Road",
+      "language": "kn",
+      "latitude": 12.8993,
+      "longitude": 77.4963,
+      "is_demo": false,
+      "created_at": "2026-11-05T21:50:34.256Z"
     }
   ],
   "farms": [
@@ -341,6 +357,13 @@
       "area_acres": 3.5,
       "soil_type": "Alluvial Loam",
       "created_at": "2026-11-05T20:56:18.493Z"
+    },
+    {
+      "id": "a681956a-83a1-4fd5-aac8-cacb6c7144f7",
+      "farmer_id": "eb2992ab-9ea5-4f35-8bf3-308c79861030",
+      "area_acres": 2.5,
+      "soil_type": "Red Sandy Loam",
+      "created_at": "2026-11-05T21:50:34.256Z"
     }
   ],
   "crops": [
@@ -478,6 +501,15 @@
       "variety": "Standard High-Yield Variety",
       "growth_stage": "Germination & Early Vegetative",
       "created_at": "2026-11-05T20:56:18.493Z"
+    },
+    {
+      "id": "9bfcb443-e111-4599-bb7e-bb330ca6a4e5",
+      "farmer_id": "eb2992ab-9ea5-4f35-8bf3-308c79861030",
+      "crop_name": "Rice (Paddy)",
+      "sowing_date": "2026-10-06",
+      "variety": "Jyothi / Sona Masoori",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T21:50:34.256Z"
     }
   ],
   "action_plans": [
@@ -570,6 +602,51 @@
       "completed": false,
       "source": "ICAR Directorate of Water Management",
       "created_at": "2026-11-05T19:07:07.259Z"
+    },
+    {
+      "id": "07d86600-3a35-40e1-88a9-f7d201eade32",
+      "farmer_id": "eb2992ab-9ea5-4f35-8bf3-308c79861030",
+      "crop_id": "9bfcb443-e111-4599-bb7e-bb330ca6a4e5",
+      "plan_date": "2026-11-05",
+      "task_key": "rain_drainage_check",
+      "task_title": "Clear Drainage Outlets & Postpone Foliar Sprays",
+      "task_description": "Heavy precipitation forecast detected (>15mm or >60% probability). Inspect bunds and clear excess water drainage channels.",
+      "reason": "Standing excess water causes root rot; rain washes away freshly sprayed foliar nutrients or crop protectants.",
+      "priority": "high",
+      "due_date": "2026-11-05",
+      "completed": false,
+      "source": "IMD-Agromet Advisory Services",
+      "created_at": "2026-11-05T21:50:35.437Z"
+    },
+    {
+      "id": "d14a9aaa-5e3c-43ff-9885-2321539e7484",
+      "farmer_id": "eb2992ab-9ea5-4f35-8bf3-308c79861030",
+      "crop_id": "9bfcb443-e111-4599-bb7e-bb330ca6a4e5",
+      "plan_date": "2026-11-05",
+      "task_key": "scout_foliage",
+      "task_title": "Inspect Foliage for Pest & Disease Symptoms",
+      "task_description": "Walk in a \"W\" pattern across the plot. Check the underside of 15-20 random leaves for discolouration, spots, or egg masses.",
+      "reason": "Early detection of fungal spots, leaf miners, or stem borer entrance holes prevents rapid spread.",
+      "priority": "medium",
+      "due_date": "2026-11-05",
+      "completed": false,
+      "source": "ICAR National Centre for Integrated Pest Management (NCIPM)",
+      "created_at": "2026-11-05T21:50:35.437Z"
+    },
+    {
+      "id": "9be4e366-169d-46c3-8ee5-2184894e6326",
+      "farmer_id": "eb2992ab-9ea5-4f35-8bf3-308c79861030",
+      "crop_id": "9bfcb443-e111-4599-bb7e-bb330ca6a4e5",
+      "plan_date": "2026-11-05",
+      "task_key": "check_soil_moisture",
+      "task_title": "Check Root Zone Moisture & Soil Friability",
+      "task_description": "Insert a soil probe or finger 5-10 cm deep near root zones. Form a small ball of soil in your palm to check moisture binding.",
+      "reason": "Prevents over-saturation which leads to root hypoxia, while guarding against moisture stress.",
+      "priority": "medium",
+      "due_date": "2026-11-05",
+      "completed": false,
+      "source": "ICAR Directorate of Water Management",
+      "created_at": "2026-11-05T21:50:35.437Z"
     }
   ],
   "chat_history": [
@@ -956,5 +1033,5 @@
       "created_at": "2026-11-05T10:47:32.102Z"
     }
   ],
-  "last_saved_at": "2026-11-05T20:56:28.260Z"
+  "last_saved_at": "2026-11-05T22:18:38.566Z"
 }

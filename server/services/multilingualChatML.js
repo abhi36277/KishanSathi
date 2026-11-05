@@ -74,25 +74,29 @@ export async function generateMultilingualReply({ farmer, crop, lifecycle, weath
   const lang = language || farmer?.language || 'en';
   const prompt = buildMultilingualPrompt({ farmer, crop, lifecycle, weather, recentHistory, userMessage, language: lang });
 
-  // 1. Try Gemini 1.5 Flash if API key is provided
+  // 1. Try Gemini Models with v1beta endpoint and multi-model fallback cascade
   if (genAI) {
-    try {
-      const model = genAI.getGenerativeModel({
-        model: modelName,
-        systemInstruction: SYSTEM_INSTRUCTION
-      });
+    const candidateModels = [modelName, 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.7-flash', 'gemini-3.6-flash'].filter((m, idx, arr) => m && arr.indexOf(m) === idx);
 
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      return {
-        success: true,
-        reply: text,
-        source: `Google Gemini 1.5 Flash (Agricultural Pipeline)`,
-        language: lang,
-        timestamp: new Date().toISOString()
-      };
-    } catch (err) {
-      console.warn('Gemini chat API error; triggering verified multilingual agronomic fallback:', err.message);
+    for (const cand of candidateModels) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: cand,
+          systemInstruction: SYSTEM_INSTRUCTION
+        }, { apiVersion: 'v1beta', timeout: 8000 });
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        return {
+          success: true,
+          reply: text,
+          source: `Google Gemini (${cand})`,
+          language: lang,
+          timestamp: new Date().toISOString()
+        };
+      } catch (err) {
+        console.warn(`Gemini chat model ${cand} error: ${err.message}. Trying next model...`);
+      }
     }
   }
 

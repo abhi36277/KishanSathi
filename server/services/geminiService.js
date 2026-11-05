@@ -76,21 +76,25 @@ export async function getGeminiReply({ farmer, crop, stage, weather, tasks, user
   const lang = language || farmer?.language || 'en';
 
   if (genAI) {
-    try {
-      const model = genAI.getGenerativeModel({
-        model: modelName,
-        systemInstruction: SYSTEM_INSTRUCTION
-      });
+    const candidateModels = [modelName, 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.7-flash', 'gemini-3.6-flash'].filter((m, idx, arr) => m && arr.indexOf(m) === idx);
 
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      return {
-        reply: text,
-        source: `Google Gemini (${modelName})`,
-        timestamp: new Date().toISOString()
-      };
-    } catch (err) {
-      console.warn(`Gemini API call failed: ${err.message}. Triggering safe agricultural fallback.`);
+    for (const cand of candidateModels) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: cand,
+          systemInstruction: SYSTEM_INSTRUCTION
+        }, { apiVersion: 'v1beta', timeout: 8000 });
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        return {
+          reply: text,
+          source: `Google Gemini (${cand})`,
+          timestamp: new Date().toISOString()
+        };
+      } catch (err) {
+        console.warn(`Gemini API call with ${cand} failed: ${err.message}. Trying next candidate if available.`);
+      }
     }
   }
 

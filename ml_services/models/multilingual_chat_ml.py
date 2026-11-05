@@ -58,17 +58,23 @@ def chat_multilingual(
                 f"Provide a helpful, respectful response strictly in {lang_name}."
             )
 
-            response = client.models.generate_content(
-                model="gemini-1.5-flash",
-                contents=prompt
-            )
-            return {
-                "success": True,
-                "pipeline": "Python-Gemini-Multilingual-Agent",
-                "language": language,
-                "timestamp": datetime.now().isoformat(),
-                "reply": response.text
-            }
+            pref_model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+            candidates = [pref_model, "gemini-3.5-flash", "gemini-flash-latest", "gemini-3.7-flash"]
+            for m in list(dict.fromkeys(candidates)):
+                try:
+                    response = client.models.generate_content(
+                        model=m,
+                        contents=prompt
+                    )
+                    return {
+                        "success": True,
+                        "pipeline": f"Python-Gemini-Multilingual-Agent ({m})",
+                        "language": language,
+                        "timestamp": datetime.now().isoformat(),
+                        "reply": response.text
+                    }
+                except Exception as cand_err:
+                    print(f"Gemini model {m} attempt failed: {cand_err}. Trying next fallback...")
         except Exception as e:
             print(f"Gemini chat error: {e}. Falling back to ICAR trilingual engine.")
 

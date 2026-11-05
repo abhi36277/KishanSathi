@@ -1,5 +1,4 @@
 import http from 'http';
-import app from './server.js';
 
 const TEST_PORT = 5000;
 const BASE_URL = `http://localhost:${TEST_PORT}/api`;

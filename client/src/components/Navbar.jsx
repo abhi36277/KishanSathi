@@ -15,7 +15,6 @@ import {
   Menu, 
   X,
   Globe,
-  Database,
   Radar,
   DollarSign,
   LogOut,
@@ -45,8 +44,7 @@ export default function Navbar() {
     { path: '/schemes', label: 'Govt Schemes', icon: Landmark },
     { path: '/transport', label: 'Transport Pool', icon: Truck },
     { path: '/community', label: 'Community', icon: Users },
-    { path: '/expenses', label: 'Expenses', icon: Wallet },
-    { path: '/database', label: 'Database', icon: Database }
+    { path: '/expenses', label: 'Expenses', icon: Wallet }
   ];
 
   return (

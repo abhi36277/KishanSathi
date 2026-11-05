@@ -23,7 +23,6 @@ import FieldMonitorPage from './pages/FieldMonitorPage';
 import SchemesPage from './pages/SchemesPage';
 import TransportPoolPage from './pages/TransportPoolPage';
 import CommunityPage from './pages/CommunityPage';
-import DatabaseViewerPage from './pages/DatabaseViewerPage';
 
 export default function App() {
   return (
@@ -51,7 +50,6 @@ export default function App() {
               <Route path="/schemes" element={<SchemesPage />} />
               <Route path="/transport" element={<TransportPoolPage />} />
               <Route path="/community" element={<CommunityPage />} />
-              <Route path="/database" element={<DatabaseViewerPage />} />
             </Routes>
           </main>
           <MobileTabBar />

@@ -377,7 +377,7 @@ def diagnose_crop_disease(
             # Fall back to offline decision tree
             print(f"Gemini Vision error: {e}. Executing ICAR heuristic model.")
 
-    # 3. Computer Vision Color & Pathology Feature Extractor
+    # 3. Computer Vision Feature Extractor & Trained PlantVillage Model Inference
     visual_clues = []
     if image_base64:
         try:
@@ -401,6 +401,28 @@ def diagnose_crop_disease(
                 visual_clues.extend(["brown", "brown spot", "pustule", "blast", "lesion"])
             if white_ratio > 0.06:
                 visual_clues.extend(["white", "white mold", "curl", "puckered"])
+
+            # Check if trained PlantVillage model artifact is available
+            model_file = os.path.join(os.path.dirname(__file__), "plantvillage_model.joblib")
+            label_file = os.path.join(os.path.dirname(__file__), "plantvillage_labels.json")
+            if os.path.exists(model_file) and os.path.exists(label_file):
+                try:
+                    import joblib
+                    sys_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                    if sys_path not in sys.path:
+                        sys.path.append(sys_path)
+                    from train_plantvillage import extract_features_from_pil
+                    pv_feats = extract_features_from_pil(img).reshape(1, -1)
+                    pv_clf = joblib.load(model_file)
+                    with open(label_file, "r", encoding="utf-8") as lf:
+                        pv_meta = json.load(lf)
+                    probs = pv_clf.predict_proba(pv_feats)[0]
+                    top_idx = int(np.argmax(probs))
+                    pred_label = pv_meta["idx_to_label"].get(str(top_idx), pv_meta["classes"][top_idx])
+                    pred_clean = pred_label.replace("___", " - ").replace("_", " ").lower()
+                    visual_clues.append(pred_clean)
+                except Exception as pv_infer_err:
+                    print(f"PlantVillage local model notice: {pv_infer_err}")
         except Exception as cv_err:
             print(f"Computer Vision pixel feature extractor notice: {cv_err}")
 

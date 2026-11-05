@@ -13,7 +13,7 @@
       "longitude": 76.8967,
       "is_demo": true,
       "created_at": "2026-11-05T10:47:32.102Z",
-      "session_token": "session-bf8def35-dffe-46d4-899f-2e848221577d"
+      "session_token": "session-b3cf31bd-6133-4ea1-880b-a33b04a9ab85"
     },
     {
       "id": "00000000-0000-0000-0000-000000000004",
@@ -122,6 +122,102 @@
       "longitude": 75.857,
       "is_demo": false,
       "created_at": "2026-11-05T19:04:34.111Z"
+    },
+    {
+      "id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "auth_user_id": "35f6443e-99b1-4e61-ae4a-185809ffa014",
+      "name": "aman",
+      "phone": "+919876543212",
+      "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+      "session_token": "session-78179d61-21f1-4553-8750-48f3b82485e2",
+      "state": "Uttar Pradesh",
+      "district": "ghazipur",
+      "village": "ghazipur",
+      "language": "en",
+      "latitude": 20.5937,
+      "longitude": 78.9629,
+      "is_demo": false,
+      "created_at": "2026-11-05T19:07:05.678Z"
+    },
+    {
+      "id": "101bf02d-b7d0-4055-8507-a863c4f17a66",
+      "auth_user_id": "06b3c080-c998-4565-adba-311473a9f500",
+      "name": "Arjun Verma",
+      "phone": "+919827085937",
+      "password_hash": "d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1",
+      "session_token": "session-f9018f06-c52e-4345-ba77-5210eaffbf60",
+      "state": "Punjab",
+      "district": "Ludhiana",
+      "village": "Samrala",
+      "language": "hi",
+      "latitude": 30.901,
+      "longitude": 75.857,
+      "is_demo": false,
+      "created_at": "2026-11-05T19:31:15.802Z"
+    },
+    {
+      "id": "9618bfb7-3136-49df-924b-caab56af5f48",
+      "auth_user_id": "afa5bb9b-7937-458a-94f3-a824808783af",
+      "name": "Arjun Verma",
+      "phone": "+919883295185",
+      "password_hash": "d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1",
+      "session_token": "session-45de0af8-a4ab-4a23-8650-5b0053f38fde",
+      "state": "Punjab",
+      "district": "Ludhiana",
+      "village": "Samrala",
+      "language": "hi",
+      "latitude": 30.901,
+      "longitude": 75.857,
+      "is_demo": false,
+      "created_at": "2026-11-05T19:35:32.499Z"
+    },
+    {
+      "id": "49cd5435-5c0e-40e1-9c30-27c30a48a89e",
+      "auth_user_id": "7107e18d-c0b6-40aa-aa2b-9a03fd233b74",
+      "name": "Arjun Verma",
+      "phone": "+919874460694",
+      "password_hash": "d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1",
+      "session_token": "session-929c9c3f-bb6a-47ef-a678-6427f04b5f5b",
+      "state": "Punjab",
+      "district": "Ludhiana",
+      "village": "Samrala",
+      "language": "hi",
+      "latitude": 30.901,
+      "longitude": 75.857,
+      "is_demo": false,
+      "created_at": "2026-11-05T20:20:12.290Z"
+    },
+    {
+      "id": "da00172e-5a0e-4877-b80a-55c3d951f91d",
+      "auth_user_id": "a21d648a-ad82-4c38-aefb-06958789cacb",
+      "name": "aniket",
+      "phone": "+919876543213",
+      "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+      "session_token": "session-b9bab8ad-5302-4cac-8744-6c1911bb72bc",
+      "state": "Karnataka",
+      "district": "Mandya",
+      "village": "Shivalli",
+      "language": "en",
+      "latitude": 12.5238,
+      "longitude": 76.8967,
+      "is_demo": false,
+      "created_at": "2026-11-05T20:29:17.820Z"
+    },
+    {
+      "id": "4c7db7cc-f7f4-4726-b7fc-faf4d5996c53",
+      "auth_user_id": "f9027596-de16-48d4-8eb0-d0c357528039",
+      "name": "Arjun Verma",
+      "phone": "+919814225738",
+      "password_hash": "d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1",
+      "session_token": "session-1c27a7e9-8b28-4e3b-a3ba-bfadd6c06efb",
+      "state": "Punjab",
+      "district": "Ludhiana",
+      "village": "Samrala",
+      "language": "hi",
+      "latitude": 30.901,
+      "longitude": 75.857,
+      "is_demo": false,
+      "created_at": "2026-11-05T20:40:49.412Z"
     }
   ],
   "farms": [
@@ -180,6 +276,48 @@
       "area_acres": 3.5,
       "soil_type": "Alluvial Loam",
       "created_at": "2026-11-05T19:04:34.111Z"
+    },
+    {
+      "id": "81f0f76b-c495-4d2a-91f6-1e626386b878",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "area_acres": 2.5,
+      "soil_type": "Red Sandy Loam",
+      "created_at": "2026-11-05T19:07:05.678Z"
+    },
+    {
+      "id": "bf93e0a8-8b63-483f-aaf7-743133765003",
+      "farmer_id": "101bf02d-b7d0-4055-8507-a863c4f17a66",
+      "area_acres": 3.5,
+      "soil_type": "Alluvial Loam",
+      "created_at": "2026-11-05T19:31:15.802Z"
+    },
+    {
+      "id": "9e882dda-b016-4300-b4c2-f6880d04005e",
+      "farmer_id": "9618bfb7-3136-49df-924b-caab56af5f48",
+      "area_acres": 3.5,
+      "soil_type": "Alluvial Loam",
+      "created_at": "2026-11-05T19:35:32.499Z"
+    },
+    {
+      "id": "92643123-707d-4368-ab83-b67978c121e9",
+      "farmer_id": "49cd5435-5c0e-40e1-9c30-27c30a48a89e",
+      "area_acres": 3.5,
+      "soil_type": "Alluvial Loam",
+      "created_at": "2026-11-05T20:20:12.290Z"
+    },
+    {
+      "id": "59ff097e-dee3-46a7-9abe-169f215ca529",
+      "farmer_id": "da00172e-5a0e-4877-b80a-55c3d951f91d",
+      "area_acres": 2.5,
+      "soil_type": "Red Sandy Loam",
+      "created_at": "2026-11-05T20:29:17.820Z"
+    },
+    {
+      "id": "a31d81f3-c9e7-4f63-b786-3c218a6ce1a0",
+      "farmer_id": "4c7db7cc-f7f4-4726-b7fc-faf4d5996c53",
+      "area_acres": 3.5,
+      "soil_type": "Alluvial Loam",
+      "created_at": "2026-11-05T20:40:49.412Z"
     }
   ],
   "crops": [
@@ -254,6 +392,60 @@
       "variety": "Standard High-Yield Variety",
       "growth_stage": "Germination & Early Vegetative",
       "created_at": "2026-11-05T19:04:34.111Z"
+    },
+    {
+      "id": "c2c32419-4976-4c94-89db-76219aa0e25a",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Rice (Paddy)",
+      "sowing_date": "2026-10-06",
+      "variety": "Jyothi / Sona Masoori",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T19:07:05.678Z"
+    },
+    {
+      "id": "330ade5d-c963-455c-a799-15d6393ab200",
+      "farmer_id": "101bf02d-b7d0-4055-8507-a863c4f17a66",
+      "crop_name": "Wheat",
+      "sowing_date": "2026-10-20",
+      "variety": "Standard High-Yield Variety",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T19:31:15.802Z"
+    },
+    {
+      "id": "a19c61f0-1df2-4a75-b167-b3c4771a0617",
+      "farmer_id": "9618bfb7-3136-49df-924b-caab56af5f48",
+      "crop_name": "Wheat",
+      "sowing_date": "2026-10-20",
+      "variety": "Standard High-Yield Variety",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T19:35:32.499Z"
+    },
+    {
+      "id": "be7bf189-4531-42f2-ae19-93c5968dc4aa",
+      "farmer_id": "49cd5435-5c0e-40e1-9c30-27c30a48a89e",
+      "crop_name": "Wheat",
+      "sowing_date": "2026-10-20",
+      "variety": "Standard High-Yield Variety",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T20:20:12.290Z"
+    },
+    {
+      "id": "b94d7935-ca4c-4094-bfd8-ff822e6be00d",
+      "farmer_id": "da00172e-5a0e-4877-b80a-55c3d951f91d",
+      "crop_name": "Rice / Paddy",
+      "sowing_date": "2026-10-06",
+      "variety": "Jyothi",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T20:29:17.820Z"
+    },
+    {
+      "id": "d182b97d-7aba-48ce-80cc-9d631f9b54f7",
+      "farmer_id": "4c7db7cc-f7f4-4726-b7fc-faf4d5996c53",
+      "crop_name": "Wheat",
+      "sowing_date": "2026-10-20",
+      "variety": "Standard High-Yield Variety",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T20:40:49.412Z"
     }
   ],
   "action_plans": [
@@ -316,6 +508,36 @@
       "completed": false,
       "source": "ICAR Directorate of Water Management",
       "created_at": "2026-11-05T17:32:21.101Z"
+    },
+    {
+      "id": "8dc5ecb7-e419-4ab5-8143-0c4a211a4662",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_id": "c2c32419-4976-4c94-89db-76219aa0e25a",
+      "plan_date": "2026-11-05",
+      "task_key": "scout_foliage",
+      "task_title": "Inspect Foliage for Pest & Disease Symptoms",
+      "task_description": "Walk in a \"W\" pattern across the plot. Check the underside of 15-20 random leaves for discolouration, spots, or egg masses.",
+      "reason": "Early detection of fungal spots, leaf miners, or stem borer entrance holes prevents rapid spread.",
+      "priority": "medium",
+      "due_date": "2026-11-05",
+      "completed": false,
+      "source": "ICAR National Centre for Integrated Pest Management (NCIPM)",
+      "created_at": "2026-11-05T19:07:07.259Z"
+    },
+    {
+      "id": "3bf83454-37ef-42aa-9a6e-4dca14073496",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_id": "c2c32419-4976-4c94-89db-76219aa0e25a",
+      "plan_date": "2026-11-05",
+      "task_key": "check_soil_moisture",
+      "task_title": "Check Root Zone Moisture & Soil Friability",
+      "task_description": "Insert a soil probe or finger 5-10 cm deep near root zones. Form a small ball of soil in your palm to check moisture binding.",
+      "reason": "Prevents over-saturation which leads to root hypoxia, while guarding against moisture stress.",
+      "priority": "medium",
+      "due_date": "2026-11-05",
+      "completed": false,
+      "source": "ICAR Directorate of Water Management",
+      "created_at": "2026-11-05T19:07:07.259Z"
     }
   ],
   "chat_history": [
@@ -388,9 +610,229 @@
       "role": "assistant",
       "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
       "created_at": "2026-11-05T19:04:36.925Z"
+    },
+    {
+      "id": "8eefb84f-d44a-446e-921e-cda49b4dc1f2",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "user",
+      "message": "When should I irrigate next?",
+      "created_at": "2026-11-05T19:32:32.913Z"
+    },
+    {
+      "id": "de75c3e2-55b6-4a17-87cc-aee702f62950",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "assistant",
+      "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
+      "created_at": "2026-11-05T19:32:32.913Z"
+    },
+    {
+      "id": "571d34d9-629a-43d6-bfae-9d12ea155239",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "user",
+      "message": "नमस्ते, आज मुझे अपनी धान की फसल में क्या करना चाहिए?",
+      "created_at": "2026-11-05T19:34:51.965Z"
+    },
+    {
+      "id": "70749fb2-cb81-4d1d-9d9d-202e685276c0",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "assistant",
+      "message": "नमस्ते रमेश गौड़ा जी! \n\nआपकी धान की फसल अभी **35 दिन (DAS)** की हो चुकी है और यह **वानस्पतिक अवस्था (कल्ले निकलने की शुरुआत)** में है। \n\nआज शिवल्ली (मंड्या) में बादल छाए हैं, नमी 98% है और **69% बारिश की संभावना** है। मौसम और फसल की स्थिति को देखते हुए आज आपको निम्नलिखित कार्य करने चाहिए:\n\n• **जल निकासी सुनिश्चित करें (सिंचाई न करें):** आज खेत में सिंचाई करने की आवश्यकता नहीं है। भारी बारिश की संभावना को देखते हुए मेड़ों और जल निकासी नालियों (Drainage channels) को साफ रखें, ताकि खेत में जरूरत से ज्यादा पानी न भरे। कल्ले फूटने के समय खेत में हल्का पानी (2-3 सेमी) पर्याप्त होता है, जलभराव न होने दें।\n\n• **खाद और छिड़काव स्थगित रखें:** आज किसी भी प्रकार का उर्वरक या कीटनाशक/फफूंदनाशक का छिड़काव न करें। बारिश के कारण दवा या खाद बहकर व्यर्थ हो जाएगी। आपकी दूसरी टॉप ड्रेसिंग (यूरिया + पोटाश) 50-60 दिनों के बीच निर्धारित है।\n\n• **कीट एवं रोग की निगरानी (Scouting):** 98% नमी और बादलों भरा मौसम फफूंद जनित रोगों (जैसे ब्लास्ट/झुलसा रोग) और कीटों (पत्ती लपेटक या तना छेदक) के लिए अनुकूल होता है। आज केवल खेत में घूमकर पौधों की पत्तियों और तनों का निरीक्षण करें।\n\n• **खरपतवार नियंत्रण:** कल्ले अच्छे से निकलें, इसके लिए खेत को खरपतवार मुक्त रखें। यदि संभव हो तो हाथ से निराई करें।\n\n**सलाह एवं सुरक्षा निर्देश:**\n* यदि खेत में किसी कीट या रोग के लक्षण दिखें, तो बिना सलाह के कोई दवा न डालें। मौसम साफ होने पर उत्पाद लेबल के अनुसार ही उपयोग करें।\n* विस्तृत जानकारी या समाधान के लिए अपने नजदीकी कृषि विज्ञान केंद्र (KVK), सहायक कृषि अधिकारी (AAO) से संपर्क करें या **किसान कॉल सेंटर के टोल-फ्री नंबर 1800-180-1551** पर कॉल करें।\n\n*(संदर्भ: ICAR - भारतीय कृषि अनुसंधान परिषद एवं UAS पैकेज ऑफ प्रैक्टिसेज)*",
+      "created_at": "2026-11-05T19:34:51.965Z"
+    },
+    {
+      "id": "e95bb27c-0923-4086-9dbe-9194240af55f",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "user",
+      "message": "When should I irrigate next?",
+      "created_at": "2026-11-05T19:36:05.680Z"
+    },
+    {
+      "id": "b14f2095-86a4-4e99-872b-6d300d1c6e48",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "assistant",
+      "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
+      "created_at": "2026-11-05T19:36:05.680Z"
+    },
+    {
+      "id": "4cfd9cce-07ce-4efa-893e-cf480615c89c",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "role": "user",
+      "message": "i have sown paddy now its not growing",
+      "created_at": "2026-11-05T20:00:17.324Z"
+    },
+    {
+      "id": "2541acf4-bec6-4199-8dc8-7c88604fd7b3",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "role": "assistant",
+      "message": "Hello aman! Regarding your Rice (Paddy) (Day 30, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: Weather conditions are stable for scheduled farming activities.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
+      "created_at": "2026-11-05T20:00:17.324Z"
+    },
+    {
+      "id": "8c4660e5-2819-4b25-a1ac-58d465d9e6f0",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "role": "user",
+      "message": "When should I give the next irrigation for my Rice (Paddy)?",
+      "created_at": "2026-11-05T20:00:45.809Z"
+    },
+    {
+      "id": "f3cb42a3-9b93-420d-9c8e-f0f964b2dfde",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "role": "assistant",
+      "message": "Hello Aman! Here is the irrigation guidance for your Rice (Paddy) crop at **30 Days After Sowing (DAS)** (Early Vegetative Stage):\n\n* **Next Irrigation Timing:** Plan your next irrigation in **approximately 2 days**.\n* **Water Depth & Care:** At this early vegetative stage, maintain shallow water (about 2 to 3 cm) in the field. Avoid deep flooding, as shallow water encourages better tillering and strong root growth.\n* **Practice Alternate Wetting & Drying:** Allow the surface water to naturally subside before applying the next light irrigation to ensure good soil aeration.\n* **Weather Condition:** The weather in Ghazipur is currently clear with a 0% chance of rain and a temperature around 22.7°C, making it ideal for carrying out your scheduled irrigation.\n\n**Safety Advisory:** Always ensure proper drainage management to avoid water stagnation. For personalized field assistance, consult your local Krishi Vigyan Kendra (KVK) or Assistant Agricultural Officer (AAO). You can also contact the Kisan Call Center toll-free helpline at **1800-180-1551**.\n\n*Source: ICAR Agronomic Package of Practices for Rice Management*",
+      "created_at": "2026-11-05T20:00:45.809Z"
+    },
+    {
+      "id": "284454d4-d40d-43ef-bc72-f16b7058150f",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "user",
+      "message": "When should I irrigate next?",
+      "created_at": "2026-11-05T20:20:31.024Z"
+    },
+    {
+      "id": "2aec1c4c-dd1c-4068-a202-50b5fbabc97c",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "assistant",
+      "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
+      "created_at": "2026-11-05T20:20:31.024Z"
+    },
+    {
+      "id": "08a7cec5-243b-4225-86bc-c14269f158ad",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "user",
+      "message": "When should I irrigate next?",
+      "created_at": "2026-11-05T20:40:53.298Z"
+    },
+    {
+      "id": "9f2874ce-a5ab-44b0-a7ee-fb6e26c6a3fb",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "assistant",
+      "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
+      "created_at": "2026-11-05T20:40:53.298Z"
     }
   ],
-  "disease_reports": [],
+  "disease_reports": [
+    {
+      "id": "decb3bfc-71be-417d-ac82-3060003b2117",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Rice (Paddy)",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "Rice Blast (Leaf & Neck Blast)",
+      "confidence": 93,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Spray Pseudomonas fluorescens @ 10g/L or Neem seed kernel extract (NSKE 5%). Avoid standing stagnant water in field. | Recommended fungicides: Tricyclazole 75% WP or Isoprothiolane 40% EC. ALWAYS verify package label and consult your local KVK / Agriculture Officer before spraying.",
+      "created_at": "2026-11-05T20:42:45.253Z"
+    },
+    {
+      "id": "9cb3c7e7-3103-4628-bb21-d3a603e21bd1",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Tomatoes",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "Tomato Late Blight",
+      "confidence": 95,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Copper oxychloride 50% WP or Bordeaux mixture 1%. Remove and destroy severely infected lower leaves. | Metalaxyl + Mancozeb 64% WP or Cymoxanil + Mancozeb. Spray during early overcast spells before rain.",
+      "created_at": "2026-11-05T20:41:33.092Z"
+    },
+    {
+      "id": "703d766b-d61b-4f03-b46f-526b44589d3c",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Tomatoes",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "General Foliar Lesion / Early Stage Pathogen Scouting",
+      "confidence": 80,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Preventative spray of 5% Neem Seed Kernel Extract (NSKE) or bio-fungicide Pseudomonas fluorescens. | Apply broad-spectrum protectant fungicide (Mancozeb 75% WP) only if spots expand rapidly over 3 consecutive days.",
+      "created_at": "2026-11-05T20:35:59.458Z"
+    },
+    {
+      "id": "5aece504-1d36-4645-b72e-68a6cf627788",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Wheat",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "General Foliar Lesion / Early Stage Pathogen Scouting",
+      "confidence": 80,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Preventative spray of 5% Neem Seed Kernel Extract (NSKE) or bio-fungicide Pseudomonas fluorescens. | Apply broad-spectrum protectant fungicide (Mancozeb 75% WP) only if spots expand rapidly over 3 consecutive days.",
+      "created_at": "2026-11-05T20:34:03.931Z"
+    },
+    {
+      "id": "4ce423d5-e495-44fe-bb06-bfa5c8561a8f",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Rice (Paddy)",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "General Foliar Lesion / Early Stage Pathogen Scouting",
+      "confidence": 80,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Preventative spray of 5% Neem Seed Kernel Extract (NSKE) or bio-fungicide Pseudomonas fluorescens. | Apply broad-spectrum protectant fungicide (Mancozeb 75% WP) only if spots expand rapidly over 3 consecutive days.",
+      "created_at": "2026-11-05T20:33:19.155Z"
+    },
+    {
+      "id": "b6363441-f3ae-44b7-bb17-1e046e30ec1d",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Rice (Paddy)",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "N/A - Non-Agricultural Image",
+      "confidence": 0,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "N/A - Please submit a clear photograph showing affected leaves, stems, or panicles of the rice crop. | No chemical intervention is applicable. Always read product labels and consult local agricultural experts prior to applying chemical control measures.",
+      "created_at": "2026-11-05T20:31:36.323Z"
+    },
+    {
+      "id": "666099ad-77df-45b6-a164-6143416e5aae",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Rice (Paddy)",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "General Foliar Lesion / Early Stage Pathogen Scouting",
+      "confidence": 80,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Preventative spray of 5% Neem Seed Kernel Extract (NSKE) or bio-fungicide Pseudomonas fluorescens. | Apply broad-spectrum protectant fungicide (Mancozeb 75% WP) only if spots expand rapidly over 3 consecutive days.",
+      "created_at": "2026-11-05T20:30:51.962Z"
+    },
+    {
+      "id": "2d9cdb6d-22d0-4ea1-840a-37f30daabfe7",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Rice (Paddy)",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "General Foliar Lesion / Early Stage Pathogen Scouting",
+      "confidence": 80,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Preventative spray of 5% Neem Seed Kernel Extract (NSKE) or bio-fungicide Pseudomonas fluorescens. | Apply broad-spectrum protectant fungicide (Mancozeb 75% WP) only if spots expand rapidly over 3 consecutive days.",
+      "created_at": "2026-11-05T20:30:30.223Z"
+    },
+    {
+      "id": "7034a1d6-4d2e-4ac8-8a07-cba9f8b40135",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Rice (Paddy)",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "Foliar Pathogen Scouting / Abiotic Leaf Stress",
+      "confidence": 82,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Preventative spray of 5% Neem Seed Kernel Extract (NSKE) or Pseudomonas fluorescens. | Protectant contact fungicide (Mancozeb 75% WP) only if lesions spread over 48 hours.",
+      "created_at": "2026-11-05T19:37:07.874Z"
+    },
+    {
+      "id": "fa9a95a1-b98f-4039-a905-4258fc30b139",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Wheat",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "Foliar Pathogen Scouting / Abiotic Leaf Stress",
+      "confidence": 82,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Preventative spray of 5% Neem Seed Kernel Extract (NSKE) or Pseudomonas fluorescens. | Protectant contact fungicide (Mancozeb 75% WP) only if lesions spread over 48 hours.",
+      "created_at": "2026-11-05T19:09:45.931Z"
+    },
+    {
+      "id": "dbb59f6d-b600-4087-a2fa-681346d25c0f",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Tomatoes",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "Foliar Pathogen Scouting / Abiotic Leaf Stress",
+      "confidence": 82,
+      "symptoms": "pest affect\n",
+      "recommendations": "Preventative spray of 5% Neem Seed Kernel Extract (NSKE) or Pseudomonas fluorescens. | Protectant contact fungicide (Mancozeb 75% WP) only if lesions spread over 48 hours.",
+      "created_at": "2026-11-05T19:09:10.911Z"
+    }
+  ],
   "farm_expenses": [
     {
       "id": "exp-01",
@@ -446,5 +888,5 @@
       "created_at": "2026-11-05T10:47:32.102Z"
     }
   ],
-  "last_saved_at": "2026-11-05T19:04:59.333Z"
+  "last_saved_at": "2026-11-05T20:43:32.174Z"
 }

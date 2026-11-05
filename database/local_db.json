@@ -13,7 +13,7 @@
       "longitude": 76.8967,
       "is_demo": true,
       "created_at": "2026-11-05T10:47:32.102Z",
-      "session_token": "session-b3cf31bd-6133-4ea1-880b-a33b04a9ab85"
+      "session_token": "session-c75c563a-c74b-457a-9ac3-0f174c657a94"
     },
     {
       "id": "00000000-0000-0000-0000-000000000004",
@@ -218,6 +218,22 @@
       "longitude": 75.857,
       "is_demo": false,
       "created_at": "2026-11-05T20:40:49.412Z"
+    },
+    {
+      "id": "3814e460-e874-4e01-9f68-0b52bccd0b6c",
+      "auth_user_id": "d019d14d-efa0-4a1e-9504-271f9ff8aa79",
+      "name": "Arjun Verma",
+      "phone": "+919850820228",
+      "password_hash": "d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1",
+      "session_token": "session-130c7b29-cbfe-4eb6-b783-b995a17c265f",
+      "state": "Punjab",
+      "district": "Ludhiana",
+      "village": "Samrala",
+      "language": "hi",
+      "latitude": 30.901,
+      "longitude": 75.857,
+      "is_demo": false,
+      "created_at": "2026-11-05T20:56:18.493Z"
     }
   ],
   "farms": [
@@ -318,6 +334,13 @@
       "area_acres": 3.5,
       "soil_type": "Alluvial Loam",
       "created_at": "2026-11-05T20:40:49.412Z"
+    },
+    {
+      "id": "10bc4c34-02c7-427c-b334-2cfbd71bb864",
+      "farmer_id": "3814e460-e874-4e01-9f68-0b52bccd0b6c",
+      "area_acres": 3.5,
+      "soil_type": "Alluvial Loam",
+      "created_at": "2026-11-05T20:56:18.493Z"
     }
   ],
   "crops": [
@@ -446,6 +469,15 @@
       "variety": "Standard High-Yield Variety",
       "growth_stage": "Germination & Early Vegetative",
       "created_at": "2026-11-05T20:40:49.412Z"
+    },
+    {
+      "id": "9ef325bd-2c00-4727-9bd9-9d7d25b67055",
+      "farmer_id": "3814e460-e874-4e01-9f68-0b52bccd0b6c",
+      "crop_name": "Wheat",
+      "sowing_date": "2026-10-20",
+      "variety": "Standard High-Yield Variety",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T20:56:18.493Z"
     }
   ],
   "action_plans": [
@@ -708,9 +740,45 @@
       "role": "assistant",
       "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
       "created_at": "2026-11-05T20:40:53.298Z"
+    },
+    {
+      "id": "34cee762-cb77-4996-a6e5-223c4264fe14",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "user",
+      "message": "When should I irrigate next?",
+      "created_at": "2026-11-05T20:56:21.782Z"
+    },
+    {
+      "id": "18890816-335a-46b4-98d2-18d5e6b9b3ad",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "assistant",
+      "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
+      "created_at": "2026-11-05T20:56:21.782Z"
     }
   ],
   "disease_reports": [
+    {
+      "id": "19a4d9d1-b545-4223-804b-d4922ef4d8b9",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Chillies",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "Rice Blast (Magnaporthe oryzae)",
+      "confidence": 94,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Spray Pseudomonas fluorescens @ 10g/L or 5% Neem Seed Kernel Extract (NSKE). Drain stagnant water. | Tricyclazole 75% WP @ recommended rate. Strictly consult your local KVK or AAO before spraying.",
+      "created_at": "2026-11-05T20:45:00.294Z"
+    },
+    {
+      "id": "e798d797-0932-40a2-a5c4-c2bde6baeecc",
+      "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
+      "crop_name": "Rice (Paddy)",
+      "image_path": "uploaded_leaf_scan.jpg",
+      "prediction": "Rice Blast (Leaf & Neck Blast)",
+      "confidence": 93,
+      "symptoms": "Visual foliage scan",
+      "recommendations": "Spray Pseudomonas fluorescens @ 10g/L or Neem seed kernel extract (NSKE 5%). Avoid standing stagnant water in field. | Recommended fungicides: Tricyclazole 75% WP or Isoprothiolane 40% EC. ALWAYS verify package label and consult your local KVK / Agriculture Officer before spraying.",
+      "created_at": "2026-11-05T20:44:49.156Z"
+    },
     {
       "id": "decb3bfc-71be-417d-ac82-3060003b2117",
       "farmer_id": "be936b55-78d0-46f7-8b96-840f806ed1db",
@@ -888,5 +956,5 @@
       "created_at": "2026-11-05T10:47:32.102Z"
     }
   ],
-  "last_saved_at": "2026-11-05T20:43:32.174Z"
+  "last_saved_at": "2026-11-05T20:56:28.260Z"
 }

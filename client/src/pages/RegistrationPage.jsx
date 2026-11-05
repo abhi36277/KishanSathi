@@ -1,7 +1,47 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { MapPin, Sprout, ArrowRight, Lock, Phone } from 'lucide-react';
+import apiClient from '../services/api';
+import { MapPin, Sprout, ArrowRight, Lock, Phone, Search, CheckCircle2 } from 'lucide-react';
+
+export const ALL_INDIAN_STATES = [
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+  'Andaman and Nicobar Islands',
+  'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi (NCT)',
+  'Jammu and Kashmir',
+  'Ladakh',
+  'Lakshadweep',
+  'Puducherry'
+];
 
 export default function RegistrationPage() {
   const { changeLanguage, registerFarmerAccount } = useApp();
@@ -14,6 +54,7 @@ export default function RegistrationPage() {
     state: 'Karnataka',
     district: 'Mandya',
     village: '',
+    pincode: '571401',
     language: 'kn',
     area_acres: '2.5',
     soil_type: 'Red Sandy Loam',
@@ -24,6 +65,7 @@ export default function RegistrationPage() {
     longitude: 76.8967
   });
 
+  const [pincodeSearching, setPincodeSearching] = useState(false);
   const [geoStatus, setGeoStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,39 +78,43 @@ export default function RegistrationPage() {
     }
   };
 
+  // Instant Pincode Auto-Fill for ANY Pincode across India
+  const handlePincodeChange = async (e) => {
+    const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+    setFormData(prev => ({ ...prev, pincode: val }));
+
+    if (val.length === 6) {
+      try {
+        setPincodeSearching(true);
+        setGeoStatus('Locating pincode across India...');
+        const res = await apiClient.get(`/location/lookup?pincode=${val}`);
+        if (res && res.success && res.data) {
+          const d = res.data;
+          setFormData(prev => ({
+            ...prev,
+            pincode: val,
+            state: d.state || prev.state,
+            district: d.district || prev.district,
+            village: d.city || prev.village,
+            latitude: d.latitude || prev.latitude,
+            longitude: d.longitude || prev.longitude
+          }));
+          setGeoStatus(`✓ Verified Location: ${d.city ? d.city + ', ' : ''}${d.district}, ${d.state} (PIN: ${val})`);
+        }
+      } catch (err) {
+        setGeoStatus('PIN code recorded. You can adjust the state or district if needed.');
+      } finally {
+        setPincodeSearching(false);
+      }
+    }
+  };
+
   const handleStateChange = (e) => {
     const selectedState = e.target.value;
-    if (selectedState === 'Karnataka') {
-      setFormData(prev => ({
-        ...prev,
-        state: 'Karnataka',
-        district: 'Mandya',
-        crop_name: 'Rice (Paddy)',
-        latitude: 12.5238,
-        longitude: 76.8967,
-        language: 'kn'
-      }));
-      changeLanguage('kn');
-    } else if (selectedState === 'Punjab') {
-      setFormData(prev => ({
-        ...prev,
-        state: 'Punjab',
-        district: 'Ludhiana',
-        crop_name: 'Wheat',
-        latitude: 30.9010,
-        longitude: 75.8573,
-        language: 'hi'
-      }));
-      changeLanguage('hi');
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        state: selectedState,
-        district: 'District HQ',
-        latitude: 20.5937,
-        longitude: 78.9629
-      }));
-    }
+    setFormData(prev => ({
+      ...prev,
+      state: selectedState
+    }));
   };
 
   const detectLocation = () => {
@@ -76,18 +122,38 @@ export default function RegistrationPage() {
       setGeoStatus('Geolocation not supported by browser. Using district coordinates.');
       return;
     }
-    setGeoStatus('Detecting GPS location...');
+    setGeoStatus('Detecting GPS location across India...');
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
+        const lat = parseFloat(pos.coords.latitude.toFixed(4));
+        const lon = parseFloat(pos.coords.longitude.toFixed(4));
         setFormData(prev => ({
           ...prev,
-          latitude: parseFloat(pos.coords.latitude.toFixed(4)),
-          longitude: parseFloat(pos.coords.longitude.toFixed(4))
+          latitude: lat,
+          longitude: lon
         }));
-        setGeoStatus(`GPS detected: ${pos.coords.latitude.toFixed(2)}°N, ${pos.coords.longitude.toFixed(2)}°E`);
+
+        try {
+          const res = await apiClient.get(`/location/lookup?lat=${lat}&lon=${lon}`);
+          if (res && res.success && res.data) {
+            const d = res.data;
+            setFormData(prev => ({
+              ...prev,
+              state: d.state || prev.state,
+              district: d.district || prev.district,
+              village: d.city || prev.village,
+              pincode: d.pincode || prev.pincode
+            }));
+            setGeoStatus(`✓ GPS Detected: ${d.city ? d.city + ', ' : ''}${d.district}, ${d.state} (${lat}°N, ${lon}°E)`);
+          } else {
+            setGeoStatus(`GPS detected: ${lat}°N, ${lon}°E`);
+          }
+        } catch (e) {
+          setGeoStatus(`GPS detected: ${lat}°N, ${lon}°E`);
+        }
       },
       (err) => {
-        setGeoStatus(`Location access denied or timed out (${err.message}). Using regional coordinates.`);
+        setGeoStatus(`Location access denied or timed out (${err.message}).`);
       },
       { timeout: 8000 }
     );
@@ -111,6 +177,7 @@ export default function RegistrationPage() {
         state: formData.state,
         district: formData.district,
         village: formData.village,
+        pincode: formData.pincode,
         language: formData.language,
         latitude: parseFloat(formData.latitude),
         longitude: parseFloat(formData.longitude),
@@ -137,13 +204,13 @@ export default function RegistrationPage() {
   return (
     <div style={{ maxWidth: '680px', margin: '24px auto', padding: '0 16px' }}>
       <div className="card" style={{ padding: '2rem 1.5rem', borderTop: '4px solid var(--primary-green)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: 10 }}>
           <div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary-green)', margin: '0 0 4px 0' }}>
               Register Your Farm Account
             </h2>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
-              Create your farmer profile to get customized daily action plans & alerts
+              Create your farmer profile to get customized daily action plans & alerts throughout India
             </p>
           </div>
           <Link
@@ -164,7 +231,7 @@ export default function RegistrationPage() {
         </div>
 
         {error && (
-          <div style={{ background: '#fee2e2', color: '#991b1b', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.85rem' }}>
+          <div style={{ padding: '0.75rem 1rem', background: '#ffebee', color: '#c62828', borderRadius: 8, marginBottom: '1.25rem', fontSize: '0.88rem' }}>
             {error}
           </div>
         )}
@@ -175,15 +242,14 @@ export default function RegistrationPage() {
             <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-dark)', marginBottom: '0.75rem' }}>
               1. Farmer Identity & Login Details
             </h4>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
               <div className="form-group">
                 <label className="form-label">Full Name *</label>
                 <input
                   type="text"
                   name="name"
                   required
-                  placeholder="e.g. Ramesh Gowda"
+                  placeholder="e.g. Ramesh Gowda / Gurpreet Singh"
                   value={formData.name}
                   onChange={handleChange}
                   className="form-input"
@@ -227,21 +293,56 @@ export default function RegistrationPage() {
             </div>
           </div>
 
-          {/* Section 2: Farm Location */}
-          <div style={{ marginBottom: '1.25rem' }}>
-            <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-dark)', marginBottom: '0.75rem' }}>
-              2. Location & Field Coordinates
-            </h4>
+          {/* Section 2: Farm Location with Any Indian Pincode Auto-Fill */}
+          <div style={{ marginBottom: '1.25rem', background: '#f8fafc', padding: 14, borderRadius: 10, border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <MapPin size={16} style={{ color: '#2e7d32' }} /> 2. Location & Field Coordinates (All-India)
+              </h4>
+              <button
+                type="button"
+                onClick={detectLocation}
+                className="btn-secondary"
+                style={{ fontSize: '0.78rem', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4 }}
+              >
+                <MapPin size={13} /> Detect via GPS
+              </button>
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
+            {/* Pincode Auto-Fill Bar */}
+            <div style={{ marginBottom: 12 }}>
+              <label className="form-label" style={{ fontWeight: 700, color: '#166534' }}>
+                Enter Pincode (Auto-fills City, District & State across India)
+              </label>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="text"
+                  name="pincode"
+                  maxLength={6}
+                  placeholder="Type any 6-digit Indian PIN (e.g. 571401, 110001, 141001, 226001, 400001)..."
+                  value={formData.pincode}
+                  onChange={handlePincodeChange}
+                  className="form-input"
+                  style={{ fontWeight: 600, fontSize: '0.92rem', borderColor: formData.pincode?.length === 6 ? '#2e7d32' : '#cbd5e1' }}
+                />
+                {pincodeSearching && (
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Searching...</span>
+                )}
+              </div>
+              {geoStatus && (
+                <div style={{ fontSize: '0.8rem', color: geoStatus.startsWith('✓') ? '#15803d' : '#64748b', marginTop: 4, fontWeight: 500 }}>
+                  {geoStatus}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
               <div className="form-group">
-                <label className="form-label">State *</label>
+                <label className="form-label">State (All 36 States & UTs) *</label>
                 <select name="state" value={formData.state} onChange={handleStateChange} className="form-select">
-                  <option value="Karnataka">Karnataka (Pilot Region)</option>
-                  <option value="Punjab">Punjab (Wheat Belt)</option>
-                  <option value="Haryana">Haryana</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  {ALL_INDIAN_STATES.map(st => (
+                    <option key={st} value={st}>{st}</option>
+                  ))}
                 </select>
               </div>
 
@@ -251,6 +352,7 @@ export default function RegistrationPage() {
                   type="text"
                   name="district"
                   required
+                  placeholder="e.g. Mandya / Ludhiana / Nashik"
                   value={formData.district}
                   onChange={handleChange}
                   className="form-input"
@@ -258,11 +360,11 @@ export default function RegistrationPage() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Village / Taluk</label>
+                <label className="form-label">Village / Taluk / Town</label>
                 <input
                   type="text"
                   name="village"
-                  placeholder="e.g. Shivalli"
+                  placeholder="e.g. Shivalli / Khanna"
                   value={formData.village}
                   onChange={handleChange}
                   className="form-input"
@@ -270,22 +372,9 @@ export default function RegistrationPage() {
               </div>
             </div>
 
-            <div style={{ background: 'var(--bg-light)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-              <div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>GPS Field Coordinates</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {formData.latitude}°N, {formData.longitude}°E
-                </div>
-                {geoStatus && <div style={{ fontSize: '0.75rem', color: '#16a34a', marginTop: '2px' }}>{geoStatus}</div>}
-              </div>
-              <button
-                type="button"
-                onClick={detectLocation}
-                className="btn-secondary"
-                style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
-              >
-                <MapPin size={14} /> Detect via GPS
-              </button>
+            <div style={{ background: '#ffffff', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.78rem', color: '#64748b' }}>
+              <span>GPS Coordinates: <strong>{formData.latitude}° N, {formData.longitude}° E</strong></span>
+              <span>Selected State: <strong style={{ color: '#0f172a' }}>{formData.state}</strong></span>
             </div>
           </div>
 
@@ -300,8 +389,8 @@ export default function RegistrationPage() {
                 <label className="form-label">Farm Size (Acres) *</label>
                 <input
                   type="number"
-                  step="0.1"
-                  min="0.1"
+                  step="0.5"
+                  min="0.5"
                   name="area_acres"
                   required
                   value={formData.area_acres}
@@ -314,9 +403,9 @@ export default function RegistrationPage() {
                 <label className="form-label">Soil Type *</label>
                 <select name="soil_type" value={formData.soil_type} onChange={handleChange} className="form-select">
                   <option value="Red Sandy Loam">Red Sandy Loam</option>
-                  <option value="Black Cotton Soil">Black Cotton Soil (Regur)</option>
-                  <option value="Alluvial Soil">Alluvial Soil</option>
-                  <option value="Clayey Loam">Clayey Loam</option>
+                  <option value="Black Cotton (Regur)">Black Cotton (Regur)</option>
+                  <option value="Alluvial Soil">Alluvial Soil (Indo-Gangetic)</option>
+                  <option value="Clay Loam">Clay Loam</option>
                   <option value="Laterite Soil">Laterite Soil</option>
                 </select>
               </div>
@@ -327,8 +416,10 @@ export default function RegistrationPage() {
                   <option value="Rice (Paddy)">Rice / Paddy (ಭತ್ತ / धान)</option>
                   <option value="Wheat">Wheat (ಗೋಧಿ / गेहूं)</option>
                   <option value="Maize">Maize (ಮೆಕ್ಕೆಜೋಳ / मक्का)</option>
+                  <option value="Cotton">Cotton (ಹತ್ತಿ / कपास)</option>
                   <option value="Tomatoes">Tomatoes (ಟೊಮ್ಯಾಟೊ / टमाटर)</option>
-                  <option value="Chillies">Chillies (ಮೆಣಸಿನಕಾಯಿ / मिर्च)</option>
+                  <option value="Mustard">Mustard (ಸಾಸಿವೆ / सरसों)</option>
+                  <option value="Sugarcane">Sugarcane (ಕಬ್ಬು / गन्ना)</option>
                 </select>
               </div>
 
@@ -349,7 +440,7 @@ export default function RegistrationPage() {
                 <input
                   type="text"
                   name="variety"
-                  placeholder="e.g. Jyothi, Sona Masoori, HD-2967, Pioneer Hybrid"
+                  placeholder="e.g. Jyothi, PBW-343, HD-2967, Shriram 111"
                   value={formData.variety}
                   onChange={handleChange}
                   className="form-input"
@@ -360,15 +451,12 @@ export default function RegistrationPage() {
 
           <button
             type="submit"
-            className="btn-primary"
+            className="btn btn-primary"
             disabled={loading}
-            style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', fontWeight: 700 }}
+            style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
           >
-            {loading ? 'Creating Your Profile...' : (
-              <>
-                <Sprout size={18} /> Register & Generate Farming Plan <ArrowRight size={18} />
-              </>
-            )}
+            {loading ? 'Creating Your Farm Profile...' : 'Complete All-India Registration'}
+            <ArrowRight size={18} />
           </button>
         </form>
       </div>

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import apiClient from '../services/api';
-import { TrendingUp, TrendingDown, Minus, Truck, MapPin, Calendar, DollarSign, ArrowRight, RefreshCw, Sparkles } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Truck, MapPin, Calendar, DollarSign, ArrowRight, RefreshCw, Sparkles, Search } from 'lucide-react';
+import { ALL_INDIAN_STATES } from './RegistrationPage';
 
 export default function MarketPricesPage() {
   const { farmer, activeCrop } = useApp();
@@ -73,17 +74,16 @@ export default function MarketPricesPage() {
       <div className="card" style={{ padding: 16, marginBottom: 20, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ flex: '1 1 200px' }}>
           <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 4 }}>
-            State Market
+            State Market (All-India AGMARKNET)
           </label>
           <select
             value={state}
             onChange={(e) => setState(e.target.value)}
-            style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #ccc' }}
+            style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #ccc', fontWeight: 600 }}
           >
-            <option value="Karnataka">Karnataka</option>
-            <option value="Punjab">Punjab</option>
-            <option value="Haryana">Haryana</option>
-            <option value="Maharashtra">Maharashtra</option>
+            {ALL_INDIAN_STATES.map(st => (
+              <option key={st} value={st}>{st}</option>
+            ))}
           </select>
         </div>
 

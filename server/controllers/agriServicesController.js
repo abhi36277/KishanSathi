@@ -286,6 +286,26 @@ export async function lookupLocation(req, res) {
             const postData = await postRes.json();
             if (postData[0]?.Status === 'Success' && postData[0]?.PostOffice?.length > 0) {
               const po = postData[0].PostOffice[0];
+              const stateCoords = {
+                'Andhra Pradesh': [15.9129, 79.7400],
+                'Assam': [26.2006, 92.9376],
+                'Bihar': [25.0961, 85.3131],
+                'Gujarat': [22.2587, 71.1924],
+                'Haryana': [29.0588, 76.0856],
+                'Karnataka': [15.3173, 75.7139],
+                'Kerala': [10.8505, 76.2711],
+                'Madhya Pradesh': [22.9734, 78.6569],
+                'Maharashtra': [19.7515, 75.7139],
+                'Odisha': [20.9517, 85.0985],
+                'Punjab': [31.1471, 75.3412],
+                'Rajasthan': [27.0238, 74.2179],
+                'Tamil Nadu': [11.1271, 78.6569],
+                'Telangana': [18.1124, 79.0193],
+                'Uttar Pradesh': [26.8467, 80.9462],
+                'West Bengal': [22.9868, 87.8550],
+                'Delhi': [28.7041, 77.1025]
+              };
+              const coords = stateCoords[po.State] || [20.5937, 78.9629];
               return res.json({
                 success: true,
                 data: {
@@ -295,8 +315,8 @@ export async function lookupLocation(req, res) {
                   district: po.District,
                   state: po.State,
                   pincode: searchTerm,
-                  latitude: 12.5238,
-                  longitude: 76.8967
+                  latitude: coords[0],
+                  longitude: coords[1]
                 }
               });
             }

@@ -1,0 +1,25 @@
+{
+  "name": "kisansathi-ai",
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "npm --prefix server start",
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "test": "npm --prefix server test",
+    "build": "npm --prefix client run build",
+    "export:mysql": "node database/export_to_mysql.js"
+  },
+  "keywords": [
+    "agriculture",
+    "farming",
+    "ai",
+    "gemini",
+    "open-meteo",
+    "karnataka",
+    "punjab",
+    "icar"
+  ],
+  "author": "KisanSathi AI Team",
+  "license": "MIT"
+}

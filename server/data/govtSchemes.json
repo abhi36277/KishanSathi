@@ -1,0 +1,67 @@
+[
+  {
+    "id": "pm_kisan",
+    "name": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+    "category": "Income Support",
+    "benefits": "₹6,000 per year in three equal installments of ₹2,000 directly transferred to bank account.",
+    "eligibility": "All landholding farmer families having cultivable land in their names (subject to exclusion criteria for institutional landowners and high income tax payers).",
+    "documents_required": [
+      "Aadhaar Card",
+      "Land Ownership Documents (Record of Rights / Pahani / 7/12)",
+      "Bank Account linked with Aadhaar",
+      "Active Mobile Number"
+    ],
+    "last_date": "Ongoing (Continuous Enrolment & e-KYC Verification)",
+    "official_portal": "https://pmkisan.gov.in",
+    "verified_by": "Ministry of Agriculture & Farmers Welfare, GoI",
+    "last_reviewed": "2026-10-15"
+  },
+  {
+    "id": "pmfby_rabi",
+    "name": "PMFBY (Pradhan Mantri Fasal Bima Yojana) - Current Season",
+    "category": "Crop Insurance",
+    "benefits": "Comprehensive risk insurance covering yield losses due to non-preventable natural risks (drought, flood, unseasonal rain, pests). Premium capped at 1.5% for Rabi crops and 2% for Kharif crops.",
+    "eligibility": "All farmers growing notified crops in notified areas (both loanee and non-loanee farmers).",
+    "documents_required": [
+      "Crop Sowing Certificate / Self-Declaration",
+      "Land Record / RTC",
+      "Bank Passbook Copy",
+      "Aadhaar Card"
+    ],
+    "last_date": "December 15 (Current Rabi Season Cut-off)",
+    "official_portal": "https://pmfby.gov.in",
+    "verified_by": "National Crop Insurance Portal, GoI",
+    "last_reviewed": "2026-10-20"
+  },
+  {
+    "id": "raitha_siri",
+    "name": "Karnataka Raitha Siri Scheme",
+    "category": "Millet Cultivation Support (Karnataka Pilot)",
+    "benefits": "₹10,000 per hectare incentive directly credited via DBT to farmers cultivating minor millets (Ragi, Foxtail, Little millet, etc.).",
+    "eligibility": "Farmers owning land in Karnataka cultivating notified millet varieties registered on the FRUITS portal.",
+    "documents_required": [
+      "FRUITS ID (FID)",
+      "Pahani / RTC showing millet crop",
+      "Aadhaar linked Bank Account"
+    ],
+    "last_date": "November 30 (Post-harvest verification window)",
+    "official_portal": "https://fruits.karnataka.gov.in",
+    "verified_by": "Department of Agriculture, Govt of Karnataka",
+    "last_reviewed": "2026-10-10"
+  },
+  {
+    "id": "soil_health_card",
+    "name": "Soil Health Card Scheme",
+    "category": "Soil Testing & Fertility",
+    "benefits": "Free comprehensive soil nutrient testing (macro and micronutrients) with customized crop-wise fertilizer recommendations.",
+    "eligibility": "All operational agricultural landholders across India.",
+    "documents_required": [
+      "Field location details / Survey Number",
+      "Farmer ID / Aadhaar"
+    ],
+    "last_date": "Open Year-Round at Block RSK / Soil Testing Labs",
+    "official_portal": "https://soilhealth.dac.gov.in",
+    "verified_by": "ICAR & Dept of Agriculture",
+    "last_reviewed": "2026-09-30"
+  }
+]

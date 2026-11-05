@@ -1,0 +1,209 @@
+{
+  "Rice": {
+    "Karnataka": {
+      "Medium_Duration": {
+        "duration_days": 130,
+        "stages": [
+          {
+            "id": "germination",
+            "name": "Nursery / Germination",
+            "start_day": 0,
+            "end_day": 20,
+            "key_activities": "Nursery seed bed preparation, seed treatment with Pseudomonas, gentle morning watering",
+            "irrigation_sensitivity": "medium",
+            "source": "University of Agricultural Sciences, Bangalore (UASB) Package of Practices",
+            "verified": true
+          },
+          {
+            "id": "tillering",
+            "name": "Tillering",
+            "start_day": 21,
+            "end_day": 50,
+            "key_activities": "Maintain 2-3 cm shallow water level, weed management, apply first top dressing of nitrogen",
+            "irrigation_sensitivity": "high",
+            "source": "ICAR-Indian Institute of Rice Research (IIRR) Hyderabad",
+            "verified": true
+          },
+          {
+            "id": "panicle_initiation",
+            "name": "Panicle Initiation",
+            "start_day": 51,
+            "end_day": 75,
+            "key_activities": "Keep continuous thin water film (3-5 cm), apply second top dressing (potash + remaining N), monitor for stem borer",
+            "irrigation_sensitivity": "critical",
+            "source": "UASB Package of Practices for Kharif Rice",
+            "verified": true
+          },
+          {
+            "id": "flowering",
+            "name": "Flowering / Heading",
+            "start_day": 76,
+            "end_day": 95,
+            "key_activities": "Ensure no moisture stress during anthesis, scout for brown planthopper and blast symptoms",
+            "irrigation_sensitivity": "critical",
+            "source": "ICAR-IIRR Rice Advisory Bulletin",
+            "verified": true
+          },
+          {
+            "id": "grain_filling",
+            "name": "Grain Filling / Dough Stage",
+            "start_day": 96,
+            "end_day": 115,
+            "key_activities": "Alternate wetting and drying, withdraw standing water 10-12 days before anticipated harvest",
+            "irrigation_sensitivity": "medium",
+            "source": "UASB Field Guide",
+            "verified": true
+          },
+          {
+            "id": "maturity",
+            "name": "Maturity / Harvest",
+            "start_day": 116,
+            "end_day": 135,
+            "key_activities": "Harvest when 85-90% grains turn golden yellow and moisture is below 20%",
+            "irrigation_sensitivity": "low",
+            "source": "ICAR-IIRR Harvest Guidelines",
+            "verified": true
+          }
+        ]
+      }
+    }
+  },
+  "Wheat": {
+    "Punjab": {
+      "Timely_Sown": {
+        "duration_days": 140,
+        "stages": [
+          {
+            "id": "sowing_emergence",
+            "name": "Sowing & Emergence",
+            "start_day": 0,
+            "end_day": 15,
+            "key_activities": "Seed treatment with Trichoderma, ensure proper soil moisture at sowing depth (5 cm)",
+            "irrigation_sensitivity": "medium",
+            "source": "Punjab Agricultural University (PAU) Ludhiana Wheat Package of Practices",
+            "verified": true
+          },
+          {
+            "id": "cri",
+            "name": "Crown Root Initiation (CRI)",
+            "start_day": 16,
+            "end_day": 28,
+            "key_activities": "Most critical first irrigation at 20-25 days; apply first top dressing of Nitrogen",
+            "irrigation_sensitivity": "critical",
+            "source": "ICAR-Indian Institute of Wheat & Barley Research (IIWBR) Karnal",
+            "verified": true
+          },
+          {
+            "id": "tillering",
+            "name": "Tillering",
+            "start_day": 29,
+            "end_day": 50,
+            "key_activities": "Monitor for yellow rust symptoms; check weed growth; weed control if required",
+            "irrigation_sensitivity": "high",
+            "source": "PAU Ludhiana Farm Bulletin",
+            "verified": true
+          },
+          {
+            "id": "jointing",
+            "name": "Jointing / Stem Elongation",
+            "start_day": 51,
+            "end_day": 75,
+            "key_activities": "Second irrigation; apply remaining nitrogen split; scout for aphid colonies",
+            "irrigation_sensitivity": "high",
+            "source": "ICAR-IIWBR Technical Bulletin 24",
+            "verified": true
+          },
+          {
+            "id": "booting_heading",
+            "name": "Booting & Heading",
+            "start_day": 76,
+            "end_day": 95,
+            "key_activities": "Critical irrigation at flowering; avoid irrigation during strong windy days to prevent lodging",
+            "irrigation_sensitivity": "critical",
+            "source": "PAU Ludhiana Agronomy Guidelines",
+            "verified": true
+          },
+          {
+            "id": "milking_dough",
+            "name": "Milking & Dough Stage",
+            "start_day": 96,
+            "end_day": 120,
+            "key_activities": "Light irrigation if terminal heat rises above 32°C; check grain plumpness",
+            "irrigation_sensitivity": "medium",
+            "source": "ICAR-IIWBR Climate Resilient Wheat Advisory",
+            "verified": true
+          },
+          {
+            "id": "ripening",
+            "name": "Ripening & Harvest",
+            "start_day": 121,
+            "end_day": 145,
+            "key_activities": "Stop irrigation completely; harvest with combine when moisture is below 12%",
+            "irrigation_sensitivity": "low",
+            "source": "PAU Ludhiana Extension Manual",
+            "verified": true
+          }
+        ]
+      }
+    }
+  },
+  "Maize": {
+    "Karnataka": {
+      "Standard_Hybrid": {
+        "duration_days": 110,
+        "stages": [
+          {
+            "id": "germination",
+            "name": "Germination / Emergence",
+            "start_day": 0,
+            "end_day": 12,
+            "key_activities": "Ensure seed germination, check for cutworm and bird damage, gap filling if required",
+            "irrigation_sensitivity": "medium",
+            "source": "UAS Dharwad / ICAR-IIMR Maize Package of Practices",
+            "verified": true
+          },
+          {
+            "id": "knee_high",
+            "name": "Knee-High Stage (V6-V8)",
+            "start_day": 13,
+            "end_day": 35,
+            "key_activities": "Scout for Fall Armyworm (FAW) in whorls; inter-cultivation/weeding; apply top dressing urea",
+            "irrigation_sensitivity": "high",
+            "source": "ICAR-Indian Institute of Maize Research (IIMR)",
+            "verified": true
+          },
+          {
+            "id": "tasseling_silking",
+            "name": "Tasseling & Silking",
+            "start_day": 36,
+            "end_day": 65,
+            "key_activities": "Critical moisture stage: any drought reduces cob fertilization. Maintain optimal soil moisture",
+            "irrigation_sensitivity": "critical",
+            "source": "UAS Dharwad Agronomy Guide",
+            "verified": true
+          },
+          {
+            "id": "grain_filling",
+            "name": "Grain Filling / Cob Development",
+            "start_day": 66,
+            "end_day": 90,
+            "key_activities": "Check cob kernel development; light irrigation during dry spells; protect from rodent pests",
+            "irrigation_sensitivity": "medium",
+            "source": "ICAR-IIMR Production Guide",
+            "verified": true
+          },
+          {
+            "id": "maturity",
+            "name": "Physiological Maturity",
+            "start_day": 91,
+            "end_day": 115,
+            "key_activities": "Look for black layer formation at kernel base; de-husk and dry cobs to 14% moisture",
+            "irrigation_sensitivity": "low",
+            "source": "UAS Bangalore Farm Handout",
+            "verified": true
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "farmers": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "auth_user_id": "00000000-0000-0000-0000-000000000001",
+      "name": "Ramesh Gowda",
+      "phone": "+919876543210",
+      "state": "Karnataka",
+      "district": "Mandya",
+      "village": "Shivalli",
+      "language": "kn",
+      "latitude": 12.5238,
+      "longitude": 76.8967,
+      "is_demo": true,
+      "created_at": "2026-11-05T10:47:32.102Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000004",
+      "auth_user_id": "00000000-0000-0000-0000-000000000004",
+      "name": "Gurpreet Singh",
+      "phone": "+919812345678",
+      "state": "Punjab",
+      "district": "Ludhiana",
+      "village": "Khanna",
+      "language": "hi",
+      "latitude": 30.901,
+      "longitude": 75.8573,
+      "is_demo": true,
+      "created_at": "2026-11-05T10:47:32.102Z"
+    },
+    {
+      "id": "66d71efd-760c-49f3-b2fb-8e92340e351a",
+      "auth_user_id": "cb74ee97-3387-4c8f-b249-4e57d1c71d10",
+      "name": "Suresh Kumar",
+      "phone": "+919988776655",
+      "state": "Karnataka",
+      "district": "Mysuru",
+      "village": "Nanjangud",
+      "language": "kn",
+      "latitude": 12.12,
+      "longitude": 76.68,
+      "is_demo": false,
+      "created_at": "2026-11-05T10:48:48.928Z"
+    }
+  ],
+  "farms": [
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "area_acres": 2.5,
+      "soil_type": "Red Sandy Loam",
+      "created_at": "2026-11-05T10:47:32.102Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000005",
+      "farmer_id": "00000000-0000-0000-0000-000000000004",
+      "area_acres": 4,
+      "soil_type": "Alluvial Loam",
+      "created_at": "2026-11-05T10:47:32.102Z"
+    },
+    {
+      "id": "4a1afa3a-a9b4-4cfa-a04b-8644a74628bc",
+      "farmer_id": "66d71efd-760c-49f3-b2fb-8e92340e351a",
+      "area_acres": 3,
+      "soil_type": "Red Sandy Loam",
+      "created_at": "2026-11-05T10:48:48.928Z"
+    }
+  ],
+  "crops": [
+    {
+      "id": "00000000-0000-0000-0000-000000000003",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "crop_name": "Rice",
+      "sowing_date": "2026-10-01",
+      "variety": "JGL 1798 (Paddy)",
+      "growth_stage": "Tillering",
+      "created_at": "2026-11-05T10:47:32.102Z"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000006",
+      "farmer_id": "00000000-0000-0000-0000-000000000004",
+      "crop_name": "Wheat",
+      "sowing_date": "2026-10-11",
+      "variety": "PBW 550",
+      "growth_stage": "Crown Root Initiation (CRI)",
+      "created_at": "2026-11-05T10:47:32.102Z"
+    },
+    {
+      "id": "0165eb4b-40e1-4065-8bea-715121526ac0",
+      "farmer_id": "66d71efd-760c-49f3-b2fb-8e92340e351a",
+      "crop_name": "Rice",
+      "sowing_date": "2026-10-10",
+      "variety": "Standard Variety",
+      "growth_stage": "Germination / Early Vegetative",
+      "created_at": "2026-11-05T10:48:48.928Z"
+    }
+  ],
+  "action_plans": [],
+  "chat_history": [],
+  "disease_reports": [],
+  "farm_expenses": [
+    {
+      "id": "exp-01",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "category": "fertilizer",
+      "amount": 850,
+      "description": "Urea top dressing 1 bag",
+      "voice_transcript": "bought one bag of urea for 850 rupees",
+      "expense_date": "2026-11-05",
+      "created_at": "2026-11-05T10:47:32.102Z"
+    }
+  ],
+  "crop_loss_evidence": [],
+  "transport_pools": [
+    {
+      "id": "pool-01",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "origin": "Shivalli, Mandya",
+      "destination_mandi": "APMC Yard Mandya",
+      "departure_date": "2026-11-07",
+      "total_capacity_kg": 2000,
+      "available_capacity_kg": 800,
+      "cost_per_kg": 1.5,
+      "vehicle_type": "Tata Ace (Chota Hathi)",
+      "contact_phone": "+919876543210",
+      "status": "open",
+      "created_at": "2026-11-05T10:47:32.102Z"
+    }
+  ],
+  "community_posts": [
+    {
+      "id": "post-01",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "author_name": "Ramesh Gowda",
+      "district": "Mandya",
+      "title": "Tractor sharing available for harrowing next Tuesday",
+      "content": "Anyone in Shivalli village needing rotavator/tractor service can coordinate to split diesel costs.",
+      "topic": "Equipment & Transport",
+      "upvotes": 5,
+      "created_at": "2026-11-05T10:47:32.102Z"
+    }
+  ],
+  "pest_alerts": [
+    {
+      "id": "pest-01",
+      "reporter_farmer_id": "00000000-0000-0000-0000-000000000001",
+      "state": "Karnataka",
+      "district": "Mandya",
+      "pest_or_disease": "Yellow Stem Borer",
+      "crop_affected": "Rice",
+      "severity": "medium",
+      "alert_message": "Stem borer deadhearts spotted in neighboring blocks. Inspect central tillers during morning hours. Consult KVK V.C. Farm Mandya.",
+      "created_at": "2026-11-05T10:47:32.102Z"
+    }
+  ],
+  "last_saved_at": "2026-11-05T11:23:56.542Z"
+}

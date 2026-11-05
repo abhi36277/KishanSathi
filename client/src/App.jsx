@@ -10,7 +10,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegistrationPage from './pages/RegistrationPage';
 import DashboardPage from './pages/DashboardPage';
-import ActionPlanPage from './pages/ActionPlanPage';
+import DailyPlannerPage from './pages/DailyPlannerPage';
 import DiseaseIdentificationPage from './pages/DiseaseIdentificationPage';
 import MarketPricesPage from './pages/MarketPricesPage';
 import CropLifecyclePage from './pages/CropLifecyclePage';
@@ -19,11 +19,11 @@ import WeatherPage from './pages/WeatherPage';
 import AiAssistantPage from './pages/AiAssistantPage';
 import CropManagementPage from './pages/CropManagementPage';
 import CropComparisonPage from './pages/CropComparisonPage';
-import ExpenseLedgerPage from './pages/ExpenseLedgerPage';
 import FieldMonitorPage from './pages/FieldMonitorPage';
 import SchemesPage from './pages/SchemesPage';
 import TransportPoolPage from './pages/TransportPoolPage';
 import CommunityPage from './pages/CommunityPage';
+import { Navigate } from 'react-router-dom';
 
 export default function App() {
   return (
@@ -38,7 +38,9 @@ export default function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegistrationPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/action-plan" element={<ActionPlanPage />} />
+                <Route path="/planner" element={<DailyPlannerPage />} />
+                <Route path="/action-plan" element={<Navigate to="/planner" replace />} />
+                <Route path="/expenses" element={<Navigate to="/planner" replace />} />
                 <Route path="/disease-identification" element={<DiseaseIdentificationPage />} />
                 <Route path="/market-prices" element={<MarketPricesPage />} />
                 <Route path="/crop-lifecycle" element={<CropLifecyclePage />} />
@@ -47,7 +49,6 @@ export default function App() {
                 <Route path="/ai-chat" element={<AiAssistantPage />} />
                 <Route path="/crops" element={<CropManagementPage />} />
                 <Route path="/crop-decider" element={<CropComparisonPage />} />
-                <Route path="/expenses" element={<ExpenseLedgerPage />} />
                 <Route path="/field-monitor" element={<FieldMonitorPage />} />
                 <Route path="/schemes" element={<SchemesPage />} />
                 <Route path="/transport" element={<TransportPoolPage />} />

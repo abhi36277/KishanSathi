@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import apiClient from '../services/api';
-import { Radar, AlertTriangle, ShieldAlert, Radio, MapPin, Send, RefreshCw, CheckCircle2, CloudRain, Search, Satellite, Compass, Thermometer } from 'lucide-react';
+import { Radar, AlertTriangle, ShieldAlert, Radio, MapPin, Send, RefreshCw, CheckCircle2, CloudRain, Search, Satellite, Compass, Thermometer, Camera, Upload, X, ShieldCheck } from 'lucide-react';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiYW1hbi15YWRhdi1zdC1qb2hucyIsImEiOiJjbXczeXRwZjMwMHV0MnpyNHg3YWtwcnl6In0.gYS7RjQbPZnyWJzZGVIxbw';
 
@@ -13,6 +13,16 @@ export default function PestRadarPage() {
   const [error, setError] = useState('');
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportSuccess, setReportSuccess] = useState('');
+
+  // Defected Plant Photo Scan State
+  const [showScanModal, setShowScanModal] = useState(false);
+  const [scanCrop, setScanCrop] = useState(activeCrop?.crop_name || 'Wheat');
+  const [scanSymptoms, setScanSymptoms] = useState('');
+  const [scanPhotoBase64, setScanPhotoBase64] = useState(null);
+  const [scanPreview, setScanPreview] = useState(null);
+  const [scanningPhoto, setScanningPhoto] = useState(false);
+  const [scanResult, setScanResult] = useState(null);
+  const [scanError, setScanError] = useState('');
 
   // Location & Geocoding State
   const [locationInput, setLocationInput] = useState(farmer?.pincode || (farmer?.district ? `${farmer.district}, ${farmer.state}` : '571401'));
@@ -164,6 +174,61 @@ export default function PestRadarPage() {
     }
   };
 
+  const handlePhotoSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 8 * 1024 * 1024) {
+      setScanError('Please select an image under 8MB');
+      return;
+    }
+
+    setScanError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      setScanPreview(reader.result);
+      setScanPhotoBase64(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmitPhotoScan = async (e) => {
+    e.preventDefault();
+    if (!scanPhotoBase64) {
+      setScanError('Please take or upload a photo of the defected leaf/plant.');
+      return;
+    }
+
+    try {
+      setScanningPhoto(true);
+      setScanError('');
+      setScanResult(null);
+
+      const res = await apiClient.post('/pest-radar/report-photo', {
+        farmerId: farmer?.id,
+        crop_name: scanCrop,
+        image_base64: scanPhotoBase64,
+        symptoms: scanSymptoms,
+        latitude: activeLocation.latitude,
+        longitude: activeLocation.longitude,
+        locationName: activeLocation.city ? `${activeLocation.city}, ${activeLocation.state}` : 'Local Region'
+      });
+
+      if (res && res.success && res.data) {
+        setScanResult(res.data);
+        setReportSuccess(`AI Confirmed: ${res.data.diagnosis?.diagnosis?.disease_name}. Area marked as AFFECTED AREA on the radar!`);
+        fetchRadarForCoords(activeLocation.latitude, activeLocation.longitude);
+        setTimeout(() => setReportSuccess(''), 8000);
+      } else {
+        setScanError(res?.error || 'Analysis failed. Please try a clearer photo.');
+      }
+    } catch (err) {
+      setScanError('Error during AI diagnosis: ' + err.message);
+    } finally {
+      setScanningPhoto(false);
+    }
+  };
+
   // Generate Mapbox Static Satellite Image URL with pins
   const getMapboxSatelliteUrl = () => {
     const lat = activeLocation.latitude;
@@ -198,9 +263,16 @@ export default function PestRadarPage() {
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button
-            onClick={() => setShowReportModal(true)}
+            onClick={() => { setShowScanModal(true); setScanResult(null); setScanError(''); }}
             className="btn btn-primary"
-            style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem', background: '#c62828', borderColor: '#b71c1c' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem', background: '#b71c1c', borderColor: '#7f0000' }}
+          >
+            <Camera size={16} /> Scan & Report Defected Plant
+          </button>
+          <button
+            onClick={() => setShowReportModal(true)}
+            className="btn btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}
           >
             <Radio size={16} /> Broadcast Outbreak
           </button>
@@ -421,15 +493,16 @@ export default function PestRadarPage() {
                       top: `${node.radar_position?.y ?? 50}%`,
                       left: `${node.radar_position?.x ?? 50}%`,
                       transform: 'translate(-50%, -50%)',
-                      width: node.threat_level === 'Critical' ? 16 : 12,
-                      height: node.threat_level === 'Critical' ? 16 : 12,
+                      width: node.is_affected_area ? 20 : node.threat_level === 'Critical' ? 16 : 12,
+                      height: node.is_affected_area ? 20 : node.threat_level === 'Critical' ? 16 : 12,
                       borderRadius: '50%',
-                      background: node.threat_level === 'Critical' ? '#ff1744' : node.threat_level === 'High' ? '#ff9100' : '#ffd600',
-                      boxShadow: `0 0 8px ${node.threat_level === 'Critical' ? '#ff1744' : '#ff9100'}`,
+                      background: node.is_affected_area ? '#d50000' : node.threat_level === 'Critical' ? '#ff1744' : node.threat_level === 'High' ? '#ff9100' : '#ffd600',
+                      boxShadow: node.is_affected_area ? '0 0 14px #ff1744, 0 0 4px #fff' : `0 0 8px ${node.threat_level === 'Critical' ? '#ff1744' : '#ff9100'}`,
+                      border: node.is_affected_area ? '2px solid #ffffff' : 'none',
                       cursor: 'pointer',
-                      zIndex: 5
+                      zIndex: node.is_affected_area ? 8 : 5
                     }}
-                    title={`${node.pest_or_disease} (${node.distance_km} km away)`}
+                    title={`${node.is_affected_area ? '[AFFECTED AREA] ' : ''}${node.pest_or_disease} (${node.distance_km} km away)`}
                   />
                 ))}
               </div>
@@ -496,15 +569,31 @@ export default function PestRadarPage() {
                   className="card"
                   style={{
                     padding: 16,
-                    borderLeft: node.threat_level === 'Critical' ? '5px solid #ff1744' : node.threat_level === 'High' ? '5px solid #ff9100' : '5px solid #fbc02d'
+                    borderLeft: node.is_affected_area ? '6px solid #d50000' : node.threat_level === 'Critical' ? '5px solid #ff1744' : node.threat_level === 'High' ? '5px solid #ff9100' : '5px solid #fbc02d',
+                    background: node.is_affected_area ? '#fff5f5' : '#fff'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6, flexWrap: 'wrap', gap: 8 }}>
                     <div>
-                      <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 2px 0', color: '#b71c1c' }}>
-                        {node.pest_or_disease}
-                      </h4>
-                      <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {node.is_affected_area && (
+                          <span style={{
+                            background: '#d50000',
+                            color: '#fff',
+                            fontSize: '0.72rem',
+                            fontWeight: 800,
+                            padding: '2px 7px',
+                            borderRadius: 4,
+                            letterSpacing: '0.04em'
+                          }}>
+                            AFFECTED AREA &bull; AI SCANNED
+                          </span>
+                        )}
+                        <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: node.is_affected_area ? '#b71c1c' : '#212121' }}>
+                          {node.pest_or_disease}
+                        </h4>
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#666', marginTop: 3 }}>
                         Affected Crop: <strong>{node.crop_affected}</strong> • Location: <strong>{node.location_name}</strong>
                       </div>
                     </div>
@@ -515,16 +604,29 @@ export default function PestRadarPage() {
                         fontWeight: 700,
                         padding: '2px 8px',
                         borderRadius: 4,
-                        background: node.threat_level === 'Critical' ? '#ffebee' : '#fff3e0',
-                        color: node.threat_level === 'Critical' ? '#c62828' : '#e65100'
+                        background: node.is_affected_area || node.threat_level === 'Critical' ? '#ffebee' : '#fff3e0',
+                        color: node.is_affected_area || node.threat_level === 'Critical' ? '#c62828' : '#e65100'
                       }}>
-                        {node.distance_km} km away
+                        {node.distance_km === 0 ? 'Inside Your Area' : `${node.distance_km} km away`}
                       </span>
                     </div>
                   </div>
 
-                  <div style={{ background: '#fafafa', padding: 10, borderRadius: 6, fontSize: '0.82rem', color: '#444', marginTop: 8 }}>
-                    <strong>Recommended Defensive Measure:</strong> {node.protective_action}
+                  {node.photo_preview && (
+                    <div style={{ marginTop: 8, marginBottom: 8 }}>
+                      <img
+                        src={node.photo_preview}
+                        alt="Defected plant sample"
+                        style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6, border: '1px solid #ef9a9a' }}
+                      />
+                    </div>
+                  )}
+
+                  <div style={{ background: node.is_affected_area ? '#ffebee' : '#fafafa', padding: 10, borderRadius: 6, fontSize: '0.82rem', color: '#444', marginTop: 8 }}>
+                    <strong style={{ color: node.is_affected_area ? '#b71c1c' : '#333' }}>
+                      {node.is_affected_area ? '⚠️ Urgent Outbreak Containment:' : 'Recommended Defensive Measure:'}
+                    </strong>{' '}
+                    {node.protective_action}
                   </div>
                 </div>
               ))}
@@ -630,6 +732,250 @@ export default function PestRadarPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: SCAN DEFECTED PLANT & MARK AFFECTED AREA */}
+      {showScanModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: 16
+        }}>
+          <div className="card" style={{ maxWidth: 520, width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: 24, background: '#fff', borderRadius: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Camera size={22} color="#b71c1c" />
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: '#b71c1c' }}>
+                  AI Defected Plant Scan & Affected Area Alert
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowScanModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.84rem', color: '#666', margin: '0 0 16px 0' }}>
+              Upload a photograph of your defected crop or leaf. Our trained PlantVillage vision AI will diagnose the disease, and immediately mark your area (<strong>{activeLocation.city || 'your coordinates'}</strong>) as an <strong>AFFECTED AREA</strong> on the regional radar for all farmers to see!
+            </p>
+
+            {scanError && (
+              <div style={{ background: '#ffebee', color: '#c62828', padding: '8px 12px', borderRadius: 6, marginBottom: 12, fontSize: '0.84rem' }}>
+                {scanError}
+              </div>
+            )}
+
+            {!scanResult ? (
+              <form onSubmit={handleSubmitPhotoScan}>
+                {/* Photo Upload Zone */}
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: 4 }}>
+                    Defected Leaf / Plant Photo *
+                  </label>
+                  <div style={{
+                    border: '2px dashed #ef9a9a',
+                    borderRadius: 10,
+                    padding: '16px',
+                    textAlign: 'center',
+                    background: '#fff9f9',
+                    cursor: 'pointer',
+                    position: 'relative'
+                  }}>
+                    {scanPreview ? (
+                      <div>
+                        <img
+                          src={scanPreview}
+                          alt="Defected plant preview"
+                          style={{ maxHeight: 180, maxWidth: '100%', borderRadius: 8, margin: '0 auto 8px auto', display: 'block' }}
+                        />
+                        <span style={{ fontSize: '0.78rem', color: '#c62828', fontWeight: 600 }}>Click or drag to change photo</span>
+                      </div>
+                    ) : (
+                      <div style={{ padding: '20px 0' }}>
+                        <Upload size={32} color="#c62828" style={{ margin: '0 auto 8px auto' }} />
+                        <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#b71c1c' }}>
+                          Upload Defected Foliage Photo
+                        </div>
+                        <div style={{ fontSize: '0.78rem', color: '#888', marginTop: 4 }}>
+                          Supports JPG, PNG up to 8MB
+                        </div>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoSelect}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        opacity: 0,
+                        cursor: 'pointer'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: 4 }}>
+                      Crop Name
+                    </label>
+                    <select
+                      value={scanCrop}
+                      onChange={(e) => setScanCrop(e.target.value)}
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid #ccc' }}
+                    >
+                      <option value="Wheat">Wheat</option>
+                      <option value="Rice (Paddy)">Rice / Paddy</option>
+                      <option value="Tomatoes">Tomatoes</option>
+                      <option value="Potato">Potato</option>
+                      <option value="Maize">Maize / Corn</option>
+                      <option value="Chillies">Chillies</option>
+                      <option value="Cotton">Cotton</option>
+                      <option value="Mustard">Mustard</option>
+                      <option value="Bean">Beans / Pulses</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: 4 }}>
+                      Affected Location
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={activeLocation.place_name || activeLocation.city}
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid #ccc', background: '#f5f5f5', fontSize: '0.82rem' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: 4 }}>
+                    Optional Symptoms or Notes
+                  </label>
+                  <input
+                    type="text"
+                    value={scanSymptoms}
+                    onChange={(e) => setScanSymptoms(e.target.value)}
+                    placeholder="e.g. Yellow linear stripes spreading after rain..."
+                    style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid #ccc', fontSize: '0.85rem' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowScanModal(false)}
+                    className="btn btn-secondary"
+                    disabled={scanningPhoto}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={scanningPhoto}
+                    style={{ background: '#b71c1c', borderColor: '#7f0000', display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
+                    {scanningPhoto ? (
+                      <>
+                        <RefreshCw size={14} className="spin" /> Analyzing Photo with AI...
+                      </>
+                    ) : (
+                      <>
+                        <ShieldAlert size={15} /> Diagnose & Mark Affected Area
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              /* Success & Diagnosis Report Card */
+              <div>
+                <div style={{
+                  background: '#e8f5e9',
+                  border: '1px solid #81c784',
+                  borderRadius: 8,
+                  padding: '12px 14px',
+                  marginBottom: 16,
+                  color: '#1b5e20',
+                  fontSize: '0.88rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8
+                }}>
+                  <ShieldCheck size={20} />
+                  <div>
+                    <strong>Successfully Marked as Affected Area!</strong>
+                    <div style={{ fontSize: '0.8rem' }}>{scanResult.broadcast_message}</div>
+                  </div>
+                </div>
+
+                {/* Diagnosis Summary */}
+                <div style={{
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 8,
+                  padding: 14,
+                  background: '#fafafa',
+                  marginBottom: 16
+                }}>
+                  <span style={{
+                    fontSize: '0.72rem',
+                    background: '#ffebee',
+                    color: '#c62828',
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    fontWeight: 700
+                  }}>
+                    {scanResult.diagnosis?.diagnosis?.severity || 'HIGH'} SEVERITY THREAT
+                  </span>
+                  <h4 style={{ margin: '6px 0 2px 0', fontSize: '1.1rem', color: '#b71c1c', fontWeight: 800 }}>
+                    {scanResult.diagnosis?.diagnosis?.disease_name}
+                  </h4>
+                  <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: 8 }}>
+                    Pathogen: {scanResult.diagnosis?.diagnosis?.pathogen_type} &bull; AI Confidence: {scanResult.diagnosis?.diagnosis?.confidence}%
+                  </div>
+
+                  <div style={{ fontSize: '0.84rem', color: '#333', lineHeight: 1.5 }}>
+                    <strong>Symptoms Identified:</strong> {scanResult.diagnosis?.diagnosis?.symptoms_identified || scanResult.diagnosis?.diagnosis?.symptoms}
+                  </div>
+
+                  <div style={{ marginTop: 8, fontSize: '0.82rem', background: '#e8f5e9', padding: '8px 10px', borderRadius: 6, color: '#1b5e20' }}>
+                    <strong>Recommended Organic Remedy:</strong> {scanResult.diagnosis?.diagnosis?.organic_treatment}
+                  </div>
+
+                  <div style={{ marginTop: 6, fontSize: '0.82rem', background: '#fff3e0', padding: '8px 10px', borderRadius: 6, color: '#e65100' }}>
+                    <strong>Containment Guidelines:</strong> {scanResult.diagnosis?.diagnosis?.chemical_guidelines}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => { setShowScanModal(false); setScanResult(null); }}
+                    className="btn btn-primary"
+                    style={{ background: '#2e7d32' }}
+                  >
+                    Done & View on Radar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -328,8 +328,8 @@ export default function DashboardPage() {
             <span className="badge badge-success" style={{ fontSize: '0.8rem' }}>
               {completedCount} / {tasks.length} Completed
             </span>
-            <Link to="/action-plan" className="btn-outline" style={{ fontSize: '0.82rem', padding: '0.4rem 0.8rem', textDecoration: 'none' }}>
-              View All Tasks <ArrowRight size={15} />
+            <Link to="/planner" className="btn-outline" style={{ fontSize: '0.82rem', padding: '0.4rem 0.8rem', textDecoration: 'none' }}>
+              Open Daily Planner & Tracker <ArrowRight size={15} />
             </Link>
           </div>
         </div>

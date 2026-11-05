@@ -29,7 +29,7 @@ CORE RULES:
 /**
  * Builds grounded multi-turn prompt with farmer memory, chat history, and lifecycle
  */
-export function buildMultilingualPrompt({ farmer, crop, lifecycle, weather, recentHistory, userMessage, language }) {
+export function buildMultilingualPrompt({ farmer, farm, crop, lifecycle, weather, farmerHistory, recentHistory, userMessage, language }) {
   const langTitle = language === 'hi' ? 'Hindi (हिंदी)' : language === 'kn' ? 'Kannada (ಕನ್ನಡ)' : 'English';
 
   const historyText = (recentHistory && recentHistory.length > 0)
@@ -40,19 +40,29 @@ export function buildMultilingualPrompt({ farmer, crop, lifecycle, weather, rece
     ? `Temperature: ${weather.current?.temperature}°C, Humidity: ${weather.current?.humidity}%, Rain Probability: ${weather.forecast?.[0]?.precipitation_probability || 0}%, Condition: ${weather.current?.condition}`
     : 'Offline baseline meteorological data.';
 
+  const pastActivitiesText = (farmerHistory && farmerHistory.length > 0)
+    ? farmerHistory.map(h => `- ${h.date}: ${h.title} [${h.details || 'Completed'}]`).join('\n')
+    : 'None recorded yet.';
+
   return `
 [SYSTEM GROUNDING MEMORY]
 Farmer Name: ${farmer?.name || 'Farmer'}
 Location: ${farmer?.village ? farmer.village + ', ' : ''}${farmer?.district || 'General'}, ${farmer?.state || 'India'}
 Target Language: ${langTitle}
 
-PLANT LIFECYCLE MEMORY:
+GROUNDED FARM CONTEXT & SITUATION:
 - Primary Crop: ${crop?.crop_name || 'General Agriculture'}
 - Sowing Date: ${crop?.sowing_date || 'N/A'}
 - Days After Sowing (DAS): ${lifecycle?.days_after_sowing ?? 'N/A'} days
 - Current Growth Stage: ${lifecycle?.current_stage?.name || crop?.growth_stage || 'Active Field Phase'}
+- Soil Type: ${farm?.soil_type || 'Loam / Alluvial'}
+- Farm Area: ${farm?.area_acres || 2.5} Acres (Calculate all inputs scaled to this exact area)
+- Expected Harvesting Time: ${lifecycle?.upcoming_milestones?.expected_harvest_window || 'Within 60-90 days'}
 - Next Irrigation Target: ${lifecycle?.upcoming_milestones?.next_irrigation_due || 'Monitor soil moisture'}
 - Next Fertilizer Target: ${lifecycle?.upcoming_milestones?.next_fertilizer_target || 'Follow stage protocol'}
+
+PAST FARM HISTORY (WHAT HAS BEEN DONE):
+${pastActivitiesText}
 
 REAL-TIME WEATHER TELEMETRY:
 ${weatherText}
@@ -64,15 +74,15 @@ ${historyText}
 ${userMessage}
 
 [INSTRUCTION]
-Respond to the farmer's query strictly in ${langTitle}. Structure your response with a brief greeting, clear bulleted recommendations, and safety reminder. Cite ICAR / UAS guidelines where applicable.`;
+Respond to the farmer's query strictly in ${langTitle}. Structure your response with a brief greeting, clear bulleted recommendations scaled to their exact acreage and soil type, and safety reminder. Cite ICAR / UAS guidelines where applicable.`;
 }
 
 /**
  * Separate ML Pipeline for Multilingual Conversational Chatbot
  */
-export async function generateMultilingualReply({ farmer, crop, lifecycle, weather, recentHistory, userMessage, language }) {
+export async function generateMultilingualReply({ farmer, farm, crop, lifecycle, weather, farmerHistory, recentHistory, userMessage, language }) {
   const lang = language || farmer?.language || 'en';
-  const prompt = buildMultilingualPrompt({ farmer, crop, lifecycle, weather, recentHistory, userMessage, language: lang });
+  const prompt = buildMultilingualPrompt({ farmer, farm, crop, lifecycle, weather, farmerHistory, recentHistory, userMessage, language: lang });
 
   // 1. Try Gemini Models with v1beta endpoint and multi-model fallback cascade
   if (genAI) {

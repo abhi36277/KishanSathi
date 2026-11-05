@@ -78,6 +78,8 @@ class PersistentDatabaseStore {
         this.transport_pools = parsed.transport_pools || [];
         this.community_posts = parsed.community_posts || [];
         this.pest_alerts = parsed.pest_alerts || [];
+        this.farmer_crop_history = parsed.farmer_crop_history || [];
+        this.daily_tracker = parsed.daily_tracker || [];
         console.log(`💾 Database loaded from disk (${this.filePath}): ${this.farmers.length} farmers, ${this.crops.length} crops, ${this.action_plans.length} tasks.`);
       } catch (e) {
         console.warn('Could not parse existing local_db.json. Initializing fresh seed data:', e.message);
@@ -244,6 +246,8 @@ class PersistentDatabaseStore {
         transport_pools: this.transport_pools,
         community_posts: this.community_posts,
         pest_alerts: this.pest_alerts,
+        farmer_crop_history: this.farmer_crop_history || [],
+        daily_tracker: this.daily_tracker || [],
         last_saved_at: new Date().toISOString()
       };
       const dir = path.dirname(this.filePath);

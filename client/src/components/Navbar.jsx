@@ -5,9 +5,9 @@ import {
   Sprout, 
   CloudSun, 
   ClipboardList, 
+  Calendar,
   Bot, 
   Scale, 
-  Wallet, 
   ShieldCheck, 
   Landmark, 
   Truck, 
@@ -34,7 +34,7 @@ export default function Navbar() {
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Sprout },
-    { path: '/action-plan', label: 'Action Plan', icon: ClipboardList },
+    { path: '/planner', label: 'Daily Planner', icon: Calendar },
     { path: '/disease-identification', label: 'Disease ID', icon: ShieldCheck },
     { path: '/market-prices', label: 'Mandi Prices', icon: DollarSign },
     { path: '/crop-lifecycle', label: 'Lifecycle', icon: Sprout },
@@ -43,8 +43,7 @@ export default function Navbar() {
     { path: '/weather', label: 'Weather', icon: CloudSun },
     { path: '/schemes', label: 'Govt Schemes', icon: Landmark },
     { path: '/transport', label: 'Transport Pool', icon: Truck },
-    { path: '/community', label: 'Community', icon: Users },
-    { path: '/expenses', label: 'Expenses', icon: Wallet }
+    { path: '/community', label: 'Community', icon: Users }
   ];
 
   return (

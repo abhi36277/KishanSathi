@@ -108,9 +108,13 @@ export async function calculatePestRadar({ latitude, longitude, weather = null }
       severity: a.severity || 'Medium',
       latitude: a.latitude || (userLat + (Math.random() - 0.5) * 0.3),
       longitude: a.longitude || (userLon + (Math.random() - 0.5) * 0.3),
-      location_name: a.district ? `${a.district}, ${a.state}` : 'Neighboring Farm',
+      location_name: a.district ? `${a.district}${a.state ? ', ' + a.state : ''}` : 'Neighboring Farm',
       reported_date: (a.created_at || new Date().toISOString()).split('T')[0],
-      protective_action: a.alert_message || 'Inspect field perimeter and consult local agricultural officer.'
+      protective_action: a.alert_message || 'Inspect field perimeter and consult local agricultural officer.',
+      is_affected_area: Boolean(a.is_affected_area),
+      is_ai_verified: Boolean(a.is_ai_verified),
+      photo_preview: a.photo_preview || null,
+      hazard_radius_km: a.hazard_radius_km || 30
     }))
   ];
 

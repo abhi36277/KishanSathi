@@ -13,6 +13,7 @@ export default function AiAssistantPage() {
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [lifecycleContext, setLifecycleContext] = useState(null);
+  const [plannerData, setPlannerData] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -29,10 +30,15 @@ export default function AiAssistantPage() {
 
     const fetchHistoryAndLifecycle = async () => {
       try {
-        const [historyRes, lifecycleRes] = await Promise.allSettled([
+        const [historyRes, lifecycleRes, plannerRes] = await Promise.allSettled([
           apiClient.get(`/ai/history/${farmer.id}`),
-          apiClient.get(`/crop-lifecycle/${farmer.id}`)
+          apiClient.get(`/crop-lifecycle/${farmer.id}`),
+          apiClient.get(`/planner/${farmer.id}`)
         ]);
+
+        if (plannerRes.status === 'fulfilled' && plannerRes.value?.success && plannerRes.value.data) {
+          setPlannerData(plannerRes.value.data);
+        }
 
         if (historyRes.status === 'fulfilled' && historyRes.value?.success && historyRes.value.data?.length > 0) {
           const formatted = historyRes.value.data.map(h => ({
@@ -252,8 +258,35 @@ export default function AiAssistantPage() {
         </div>
       </div>
 
-      {/* Real-Time Plant Lifecycle Memory Strip */}
-      {lifecycleContext && (
+      {/* Real-Time Grounded Context & Farm Telemetry Memory Strip */}
+      {plannerData?.farmer_context ? (
+        <div style={{
+          background: '#f1f8e9',
+          borderBottom: '1px solid #c8e6c9',
+          padding: '8px 14px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          fontSize: '0.78rem',
+          color: '#2e7d32',
+          overflowX: 'auto',
+          whiteSpace: 'nowrap'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Sprout size={14} />
+            <strong>Crop:</strong> {plannerData.farmer_context.crop_name} &bull; {plannerData.farmer_context.growth_stage} (Day {plannerData.farmer_context.das})
+          </div>
+          <div>
+            <strong>Soil:</strong> {plannerData.farmer_context.soil_type} &bull; {plannerData.farmer_context.area_acres} Acres
+          </div>
+          <div>
+            <strong>Weather API:</strong> {plannerData.weather_telemetry?.temperature_c}&deg;C, {plannerData.weather_telemetry?.condition} ({plannerData.weather_telemetry?.rain_chance_pct}% rain)
+          </div>
+          <div style={{ color: '#e65100', fontWeight: 700 }}>
+            <strong>Harvest Window:</strong> {plannerData.harvest_forecast?.days_until_harvest} Days left ({plannerData.harvest_forecast?.expected_harvest_window})
+          </div>
+        </div>
+      ) : lifecycleContext && (
         <div style={{
           background: '#f9fbf9',
           borderBottom: '1px solid #e0e0e0',

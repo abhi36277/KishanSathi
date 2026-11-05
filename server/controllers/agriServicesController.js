@@ -12,7 +12,10 @@ import crypto from 'crypto';
  */
 export async function identifyDisease(req, res) {
   try {
-    const { farmerId, crop_name, symptoms, image_base64 } = req.body;
+    const crop_name = req.body.crop_name || req.body.cropName || req.body.crop || 'Rice (Paddy)';
+    const symptoms = req.body.symptoms || '';
+    const image_base64 = req.body.image_base64 || req.body.imageBase64 || null;
+    const farmerId = req.body.farmerId;
 
     let farmerLocation = 'Karnataka';
     if (farmerId) {
@@ -23,9 +26,9 @@ export async function identifyDisease(req, res) {
     // Try Python ML Microservice first
     let result = null;
     const pyRes = await callPythonML('/ml/disease/identify', 'POST', {
-      crop_name: crop_name || 'Rice (Paddy)',
-      symptoms: symptoms || '',
-      image_base64: image_base64 || null,
+      crop_name: crop_name,
+      symptoms: symptoms,
+      image_base64: image_base64,
       location: farmerLocation
     });
 
@@ -33,9 +36,9 @@ export async function identifyDisease(req, res) {
       result = pyRes.data;
     } else {
       result = await identifyPlantDisease({
-        cropName: crop_name || 'Rice (Paddy)',
-        symptoms: symptoms || '',
-        imageBase64: image_base64 || null,
+        cropName: crop_name,
+        symptoms: symptoms,
+        imageBase64: image_base64,
         farmerLocation
       });
     }
@@ -183,12 +186,20 @@ export async function getPestRadar(req, res) {
     const humidity = weather?.current?.humidity ?? 78.0;
     const temp = weather?.current?.temperature ?? 26.5;
 
-    const pyRes = await callPythonML(`/ml/radar/scan?lat=${latitude}&lon=${longitude}&humidity=${humidity}&temp=${temp}`);
-    if (pyRes.success && pyRes.data) {
-      return res.json({ success: true, data: pyRes.data, error: null });
+    // Run comprehensive geospatial radar incorporating crowdsourced affected areas and climate risk
+    const radarResult = await calculatePestRadar({ latitude, longitude, weather });
+
+    // Enrich with Python ML microservice climate scoring if available
+    try {
+      const pyRes = await callPythonML(`/ml/radar/scan?lat=${latitude}&lon=${longitude}&humidity=${humidity}&temp=${temp}`);
+      if (pyRes.success && pyRes.data) {
+        if (pyRes.data.climate_risk_index) radarResult.climate_threat_index = pyRes.data.climate_risk_index;
+        if (pyRes.data.climate_risk_description) radarResult.climate_threat_advisory = pyRes.data.climate_risk_description;
+      }
+    } catch (e) {
+      // offline fallback is already inside radarResult
     }
 
-    const radarResult = await calculatePestRadar({ latitude, longitude, weather });
     return res.json({
       success: true,
       data: radarResult,
@@ -228,6 +239,117 @@ export async function submitPestReport(req, res) {
       error: null
     });
   } catch (error) {
+    return res.status(500).json({ success: false, data: null, error: error.message });
+  }
+}
+
+/**
+ * Defected Plant Photo Analysis & Affected Area Reporting
+ * Analyzes photo using PlantVillage Vision / Pathology AI and marks farmer's area as AFFECTED AREA
+ */
+export async function reportPhotoPestOutbreak(req, res) {
+  try {
+    const crop_name = req.body.crop_name || req.body.cropName || req.body.crop || 'Rice (Paddy)';
+    const image_base64 = req.body.image_base64 || req.body.imageBase64 || null;
+    const symptoms = req.body.symptoms || '';
+    const farmerId = req.body.farmerId;
+    const latitude = req.body.latitude;
+    const longitude = req.body.longitude;
+    const locationName = req.body.locationName;
+
+    if (!image_base64) {
+      return res.status(400).json({ success: false, data: null, error: 'A photo of the defected plant is required for AI analysis' });
+    }
+
+    let farmerLocation = locationName || 'Karnataka';
+    let farmer = null;
+    if (farmerId) {
+      farmer = localStore.farmers.find(f => f.id === farmerId);
+      if (farmer?.state) farmerLocation = `${farmer.village || farmer.district || ''}, ${farmer.state}`;
+    }
+
+    // 1. Diagnose photo using Python PlantVillage ML or Node fallback
+    let diagnosisResult = null;
+    const pyRes = await callPythonML('/ml/disease/identify', 'POST', {
+      crop_name: crop_name,
+      symptoms: symptoms || 'Defected foliage inspected in field survey',
+      image_base64: image_base64,
+      location: farmerLocation
+    });
+
+    if (pyRes.success && pyRes.data) {
+      diagnosisResult = pyRes.data;
+    } else {
+      diagnosisResult = await identifyPlantDisease({
+        cropName: crop_name,
+        symptoms: symptoms || 'Defected foliage inspected in field survey',
+        imageBase64: image_base64,
+        farmerLocation
+      });
+    }
+
+    const diagnosis = diagnosisResult.diagnosis || {};
+    const diseaseName = diagnosis.disease_name || 'Unspecified Foliar Pathogen';
+    const severity = diagnosis.severity || 'High';
+    const repLat = parseFloat(latitude) || farmer?.latitude || 12.5238;
+    const repLon = parseFloat(longitude) || farmer?.longitude || 76.8967;
+    const placeName = locationName || (farmer ? `${farmer.village ? farmer.village + ', ' : ''}${farmer.district || ''}, ${farmer.state || ''}` : 'Local Fields');
+
+    // 2. Mark this area as an AFFECTED AREA in pest_alerts
+    const affectedAreaAlert = {
+      id: crypto.randomUUID(),
+      reporter_farmer_id: farmerId,
+      pest_or_disease: diseaseName,
+      crop_affected: crop_name,
+      severity: severity.toLowerCase(),
+      latitude: repLat,
+      longitude: repLon,
+      district: placeName,
+      is_affected_area: true,
+      is_ai_verified: true,
+      hazard_radius_km: 30,
+      photo_preview: image_base64.length > 30000 ? image_base64.slice(0, 30000) : image_base64,
+      alert_message: `🚨 AFFECTED AREA: AI verified ${diseaseName} on ${crop_name}. Immediate preventative measures advised within 30 km radius.`,
+      organic_remedy: diagnosis.organic_treatment || 'Apply 5% Neem Seed Kernel Extract (NSKE).',
+      cultural_remedy: diagnosis.cultural_practices || 'Maintain drainage and inspect border crops.',
+      chemical_guidelines: diagnosis.chemical_guidelines || 'Consult local KVK agronomist.',
+      created_at: new Date().toISOString()
+    };
+
+    if (isSupabaseConfigured) {
+      await supabase.from('pest_alerts').insert([affectedAreaAlert]);
+    } else {
+      localStore.pest_alerts.unshift(affectedAreaAlert);
+      localStore.save();
+    }
+
+    // 3. Log to farmer persistent history
+    if (farmerId) {
+      const historyRecord = {
+        id: crypto.randomUUID(),
+        farmer_id: farmerId,
+        date: new Date().toISOString().split('T')[0],
+        activity_type: 'Pest Outbreak Alert',
+        title: `Defected Plant Scanned - ${diseaseName}`,
+        details: `Reported and marked ${placeName} as an affected area. AI identified ${diseaseName} (${severity} severity).`,
+        status: 'Reported',
+        created_at: new Date().toISOString()
+      };
+      localStore.farmer_crop_history.unshift(historyRecord);
+      localStore.save();
+    }
+
+    return res.status(201).json({
+      success: true,
+      data: {
+        diagnosis: diagnosisResult,
+        affected_area: affectedAreaAlert,
+        broadcast_message: `Area "${placeName}" has been successfully marked as an AFFECTED AREA for ${diseaseName}. All regional farmers on the radar have been alerted!`
+      },
+      error: null
+    });
+  } catch (error) {
+    console.error('reportPhotoPestOutbreak error:', error);
     return res.status(500).json({ success: false, data: null, error: error.message });
   }
 }

@@ -18,8 +18,15 @@ import {
   getCropLifecycle,
   getPestRadar,
   submitPestReport,
+  reportPhotoPestOutbreak,
   lookupLocation
 } from './controllers/agriServicesController.js';
+import {
+  getDailyPlannerAndTracker,
+  toggleTaskChecker,
+  logFarmerActivity,
+  updateFarmerContext
+} from './controllers/plannerController.js';
 import {
   compareCrops,
   addExpense,
@@ -163,7 +170,14 @@ app.get('/api/crop-lifecycle/:farmerId', requireAuth, verifyFarmerOwnership, get
 // ML Model 4: Geospatial Pest Radar by Location API with Live Alert Map
 app.get('/api/pest-radar', getPestRadar);
 app.post('/api/pest-radar/report', requireAuth, submitPestReport);
+app.post('/api/pest-radar/report-photo', reportPhotoPestOutbreak);
 app.get('/api/location/lookup', lookupLocation);
+
+// Grounded Daily Planner, Tracker & Interactive Checker
+app.get('/api/planner/:farmerId', getDailyPlannerAndTracker);
+app.post('/api/planner/task/check', toggleTaskChecker);
+app.post('/api/planner/activity/log', logFarmerActivity);
+app.patch('/api/planner/context/:farmerId', updateFarmerContext);
 
 // 8. Agricultural & Community Features
 app.post('/api/crop-comparison', compareCrops);

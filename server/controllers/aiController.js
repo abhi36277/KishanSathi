@@ -19,6 +19,8 @@ export async function chatWithAI(req, res) {
     // 1. Gather Farmer & Crop Context
     let farmer = null;
     let crop = null;
+    let farm = null;
+    let farmerHistory = [];
 
     if (isSupabaseConfigured) {
       const { data: fData } = await supabase.from('farmers').select('*').eq('id', farmerId).single();
@@ -26,10 +28,14 @@ export async function chatWithAI(req, res) {
       if (farmer) {
         const { data: cData } = await supabase.from('crops').select('*').eq('farmer_id', farmerId).order('created_at', { ascending: false }).limit(1);
         crop = cData?.[0] || null;
+        const { data: fmData } = await supabase.from('farms').select('*').eq('farmer_id', farmerId).limit(1);
+        farm = fmData?.[0] || null;
       }
     } else {
       farmer = localStore.farmers.find(f => f.id === farmerId);
       crop = localStore.crops.filter(c => c.farmer_id === farmerId).pop() || null;
+      farm = localStore.farms.find(f => f.farmer_id === farmerId) || null;
+      farmerHistory = (localStore.farmer_crop_history || []).filter(h => h.farmer_id === farmerId).slice(0, 5);
     }
 
     // 2. Compute Plant Lifecycle Model Context
@@ -68,9 +74,11 @@ export async function chatWithAI(req, res) {
     const targetLanguage = language || farmer?.language || 'en';
     const aiResult = await generateMultilingualReply({
       farmer,
+      farm,
       crop,
       lifecycle,
       weather,
+      farmerHistory,
       recentHistory,
       userMessage: message,
       language: targetLanguage

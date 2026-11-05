@@ -25,3 +25,14 @@ Thumbs.db
 
 # MySQL binary data directory (keep schema and dump SQL, ignore engine binary files)
 database/mysql_data/
+
+# Python Bytecode & Virtual Environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+ml_services/.env
+

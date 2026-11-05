@@ -13,20 +13,20 @@ import {
   ArrowRight, 
   Sparkles,
   MapPin,
-  CalendarCheck
+  CalendarCheck,
+  Radar,
+  DollarSign,
+  Truck,
+  FileText,
+  UserCheck
 } from 'lucide-react';
 
 export default function LandingPage() {
-  const { t, startDemoMode } = useApp();
+  const { farmer } = useApp();
   const navigate = useNavigate();
 
-  const handleDemoClick = (region) => {
-    startDemoMode(region);
-    navigate('/dashboard');
-  };
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', maxWidth: 1040, margin: '0 auto', padding: '0 16px' }}>
       {/* Hero Section */}
       <section style={{
         background: 'linear-gradient(145deg, #eaf5ec 0%, #ffffff 100%)',
@@ -38,7 +38,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: '850px', margin: '0 auto' }}>
           <div className="badge badge-success" style={{ marginBottom: '1.25rem', padding: '0.4rem 0.8rem' }}>
             <Sparkles size={14} />
-            <span>{t.hero.badge}</span>
+            <span>KisanSathi AI v2.0 • Autonomous Multi-Model Agricultural Platform</span>
           </div>
 
           <h1 style={{
@@ -48,7 +48,7 @@ export default function LandingPage() {
             lineHeight: 1.2,
             marginBottom: '1rem'
           }}>
-            {t.hero.title}
+            Your Farm. Your Language. Your AI Partner.
           </h1>
 
           <p style={{
@@ -57,23 +57,28 @@ export default function LandingPage() {
             lineHeight: 1.6,
             marginBottom: '2rem'
           }}>
-            {t.hero.subtitle}
+            Personalized daily farming action plans, AI disease identification, mandi price forecasts, from-start sowing & irrigation schedules, and nearby pest radar in English, Hindi, and Kannada.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-            <Link to="/register" className="btn-primary" style={{ padding: '0.85rem 1.75rem', fontSize: '1rem' }}>
-              <span>{t.hero.getStarted}</span>
-              <ArrowRight size={18} />
-            </Link>
+            {farmer ? (
+              <Link to="/dashboard" className="btn-primary" style={{ padding: '0.85rem 1.75rem', fontSize: '1rem' }}>
+                <span>Go to Your Farm Dashboard</span>
+                <ArrowRight size={18} />
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="btn-primary" style={{ padding: '0.85rem 1.75rem', fontSize: '1rem' }}>
+                  <UserCheck size={18} />
+                  <span>Farmer Login</span>
+                </Link>
 
-            <button 
-              onClick={() => handleDemoClick('karnataka')} 
-              className="btn-secondary"
-              style={{ padding: '0.85rem 1.5rem', fontSize: '1rem' }}
-            >
-              <Sparkles size={18} />
-              <span>{t.hero.exploreDemo}</span>
-            </button>
+                <Link to="/register" className="btn-secondary" style={{ padding: '0.85rem 1.5rem', fontSize: '1rem' }}>
+                  <Sprout size={18} />
+                  <span>Register New Farm Account</span>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Pilot Scope Label */}
@@ -89,7 +94,7 @@ export default function LandingPage() {
             color: 'var(--text-muted)'
           }}>
             <MapPin size={15} color="var(--primary-green)" />
-            <span>{t.hero.pilotNotice}</span>
+            <span>Verified Crop Packages: Karnataka (Rice, Maize) & Punjab/North India (Wheat) + General Guidance</span>
           </div>
         </div>
       </section>
@@ -98,94 +103,144 @@ export default function LandingPage() {
       <section>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-dark)' }}>
-            Why KisanSathi AI is Different
+            Specialized Multi-Model Features
           </h2>
           <p style={{ color: 'var(--text-muted)', marginTop: '0.3rem' }}>
-            Not just a general chatbot. Grounded agricultural workflows engineered for actual farm operations.
+            Each function is powered by a dedicated agronomic ML pipeline running independently.
           </p>
         </div>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
           gap: '1.25rem'
         }}>
-          {/* Feature 1 */}
-          <div className="card" style={{ borderTop: '4px solid var(--primary-green)' }}>
-            <div style={{ color: 'var(--primary-green)', marginBottom: '0.75rem' }}>
-              <ClipboardList size={28} />
+          {/* Feature 1: Disease ID */}
+          <div className="card" style={{ borderTop: '4px solid #c62828' }}>
+            <div style={{ color: '#c62828', marginBottom: '0.75rem' }}>
+              <ShieldCheck size={28} />
             </div>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.4rem' }}>
-              {t.features.actionPlanTitle}
+              AI Disease Identification
             </h3>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              {t.features.actionPlanDesc}
+              Upload a leaf photo or select symptoms. Our computer vision model identifies pathogens, organic treatments, and cultural adjustments.
             </p>
+            <Link to="/disease-identification" style={{ fontSize: '0.85rem', color: '#c62828', fontWeight: 700, textDecoration: 'none' }}>
+              Open Disease Scanner →
+            </Link>
           </div>
 
-          {/* Feature 2 */}
+          {/* Feature 2: Mandi Prices */}
+          <div className="card" style={{ borderTop: '4px solid #2e7d32' }}>
+            <div style={{ color: '#2e7d32', marginBottom: '0.75rem' }}>
+              <DollarSign size={28} />
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.4rem' }}>
+              Mandi Prices & 7-Day ML Forecast
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              Real AGMARKNET prices, modal rates, 7-day ARIMA price trajectories, and net pocket realization after deducting freight.
+            </p>
+            <Link to="/market-prices" style={{ fontSize: '0.85rem', color: '#2e7d32', fontWeight: 700, textDecoration: 'none' }}>
+              View Mandi Rates →
+            </Link>
+          </div>
+
+          {/* Feature 3: From Start Lifecycle */}
           <div className="card" style={{ borderTop: '4px solid #0284c7' }}>
             <div style={{ color: '#0284c7', marginBottom: '0.75rem' }}>
-              <CloudSun size={28} />
+              <Sprout size={28} />
             </div>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.4rem' }}>
-              {t.features.weatherTitle}
+              Full Lifecycle: Sowing, Irrigation, Fertilizer
             </h3>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              {t.features.weatherDesc}
+              Day-by-day stage tracking from certified seed treatment and basal doses to critical irrigation windows and harvest.
             </p>
+            <Link to="/crop-lifecycle" style={{ fontSize: '0.85rem', color: '#0284c7', fontWeight: 700, textDecoration: 'none' }}>
+              Explore Lifecycle Guide →
+            </Link>
           </div>
 
-          {/* Feature 3 */}
+          {/* Feature 4: Nearby Pest Radar */}
+          <div className="card" style={{ borderTop: '4px solid #e65100' }}>
+            <div style={{ color: '#e65100', marginBottom: '0.75rem' }}>
+              <Radar size={28} />
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.4rem' }}>
+              Nearby Pest Radar & Outbreak Map
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              GPS location-based outbreak clustering. Scans humidity & temperature to forecast fungal/pest incubation with 1-click alerts.
+            </p>
+            <Link to="/pest-radar" style={{ fontSize: '0.85rem', color: '#e65100', fontWeight: 700, textDecoration: 'none' }}>
+              Scan Pest Radar →
+            </Link>
+          </div>
+
+          {/* Feature 5: Multilingual Conversational AI */}
           <div className="card" style={{ borderTop: '4px solid #7c3aed' }}>
             <div style={{ color: '#7c3aed', marginBottom: '0.75rem' }}>
               <Bot size={28} />
             </div>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.4rem' }}>
-              {t.features.aiTitle}
+              Multilingual Assistant with Memory
             </h3>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              {t.features.aiDesc}
+              Speaks English, Hindi, and Kannada. Retains complete memory of your crops, sowing date, and past chats with audio synthesis.
             </p>
+            <Link to="/ai-chat" style={{ fontSize: '0.85rem', color: '#7c3aed', fontWeight: 700, textDecoration: 'none' }}>
+              Chat with KisanSathi →
+            </Link>
           </div>
 
-          {/* Feature 4 */}
-          <div className="card" style={{ borderTop: '4px solid #d97706' }}>
-            <div style={{ color: '#d97706', marginBottom: '0.75rem' }}>
-              <CalendarCheck size={28} />
-            </div>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.4rem' }}>
-              {t.features.adaptiveTitle}
-            </h3>
-            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              {t.features.adaptiveDesc}
-            </p>
-          </div>
-
-          {/* Feature 5 */}
+          {/* Feature 6: Transport Pooling & Mandi Trips */}
           <div className="card" style={{ borderTop: '4px solid #059669' }}>
             <div style={{ color: '#059669', marginBottom: '0.75rem' }}>
-              <Scale size={28} />
+              <Truck size={28} />
             </div>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.4rem' }}>
-              {t.features.comparisonTitle}
+              Transport Pooling for Mandi Trips
             </h3>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              {t.features.comparisonDesc}
+              Share pickup trucks, tractors, and tempos with neighboring farmers traveling to the same APMC mandi to cut freight costs.
             </p>
+            <Link to="/transport" style={{ fontSize: '0.85rem', color: '#059669', fontWeight: 700, textDecoration: 'none' }}>
+              Find Shared Transport →
+            </Link>
           </div>
 
-          {/* Feature 6 */}
+          {/* Feature 7: Hand-Verified Govt Schemes */}
           <div className="card" style={{ borderTop: '4px solid #b45309' }}>
             <div style={{ color: '#b45309', marginBottom: '0.75rem' }}>
-              <Wallet size={28} />
+              <FileText size={28} />
             </div>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.4rem' }}>
-              {t.features.expenseTitle}
+              Government Schemes Hub
             </h3>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              {t.features.expenseDesc}
+              Official PM-KISAN, PMFBY, and state subsidies with interactive eligibility checker, document checklist, and official portal links.
             </p>
+            <Link to="/schemes" style={{ fontSize: '0.85rem', color: '#b45309', fontWeight: 700, textDecoration: 'none' }}>
+              Check Scheme Eligibility →
+            </Link>
+          </div>
+
+          {/* Feature 8: Community Discussion */}
+          <div className="card" style={{ borderTop: '4px solid #0284c7' }}>
+            <div style={{ color: '#0284c7', marginBottom: '0.75rem' }}>
+              <ClipboardList size={28} />
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.4rem' }}>
+              Community Discussion Forum
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              Connect with fellow farmers in your taluk. Ask questions, share equipment, discuss mandi prices, and get verified advice.
+            </p>
+            <Link to="/community" style={{ fontSize: '0.85rem', color: '#0284c7', fontWeight: 700, textDecoration: 'none' }}>
+              Join Farmer Community →
+            </Link>
           </div>
         </div>
       </section>
@@ -198,83 +253,83 @@ export default function LandingPage() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '1.5rem'
         }}>
-          <div>
+          <div style={{ textAlign: 'center' }}>
             <div style={{
-              width: '40px',
-              height: '40px',
+              width: 44,
+              height: 44,
               borderRadius: '50%',
-              background: 'var(--primary-green)',
-              color: 'white',
+              background: 'var(--color-primary-light, #e8f5e9)',
+              color: 'var(--primary-green)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 800,
-              marginBottom: '0.75rem'
-            }}>1</div>
-            <h4 style={{ fontWeight: 700, marginBottom: '0.3rem' }}>Profile & Crop Setup</h4>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Enter your village, district, crop type (Rice, Wheat, Maize) and sowing date.
-            </p>
+              margin: '0 auto 1rem auto'
+            }}>
+              1
+            </div>
+            <h4 style={{ fontWeight: 700, marginBottom: '0.3rem' }}>Register Farm</h4>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Enter your crop, sowing date, and village location.</p>
           </div>
 
-          <div>
+          <div style={{ textAlign: 'center' }}>
             <div style={{
-              width: '40px',
-              height: '40px',
+              width: 44,
+              height: 44,
               borderRadius: '50%',
-              background: 'var(--primary-green)',
-              color: 'white',
+              background: 'var(--color-primary-light, #e8f5e9)',
+              color: 'var(--primary-green)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 800,
-              marginBottom: '0.75rem'
-            }}>2</div>
-            <h4 style={{ fontWeight: 700, marginBottom: '0.3rem' }}>Stage & Weather Sync</h4>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Engine calculates exact growth stage (e.g. CRI or Tillering) and pulls Open-Meteo forecasts.
-            </p>
+              margin: '0 auto 1rem auto'
+            }}>
+              2
+            </div>
+            <h4 style={{ fontWeight: 700, marginBottom: '0.3rem' }}>Hyperlocal Telemetry</h4>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>We retrieve live Open-Meteo weather and active pest radar reports.</p>
           </div>
 
-          <div>
+          <div style={{ textAlign: 'center' }}>
             <div style={{
-              width: '40px',
-              height: '40px',
+              width: 44,
+              height: 44,
               borderRadius: '50%',
-              background: 'var(--primary-green)',
-              color: 'white',
+              background: 'var(--color-primary-light, #e8f5e9)',
+              color: 'var(--primary-green)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 800,
-              marginBottom: '0.75rem'
-            }}>3</div>
-            <h4 style={{ fontWeight: 700, marginBottom: '0.3rem' }}>Daily Action Plan</h4>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Receive what to do today, why, and the ICAR citation. Adaptive recalculation if missed.
-            </p>
+              margin: '0 auto 1rem auto'
+            }}>
+              3
+            </div>
+            <h4 style={{ fontWeight: 700, marginBottom: '0.3rem' }}>Autonomous Rules</h4>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Deterministic agronomic rule engine generates your daily action checklist.</p>
           </div>
 
-          <div>
+          <div style={{ textAlign: 'center' }}>
             <div style={{
-              width: '40px',
-              height: '40px',
+              width: 44,
+              height: 44,
               borderRadius: '50%',
-              background: 'var(--primary-green)',
-              color: 'white',
+              background: 'var(--color-primary-light, #e8f5e9)',
+              color: 'var(--primary-green)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 800,
-              marginBottom: '0.75rem'
-            }}>4</div>
-            <h4 style={{ fontWeight: 700, marginBottom: '0.3rem' }}>Ask in Your Language</h4>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Speak or type in Kannada, Hindi, or English. Gemini AI replies using your real farm context.
-            </p>
+              margin: '0 auto 1rem auto'
+            }}>
+              4
+            </div>
+            <h4 style={{ fontWeight: 700, marginBottom: '0.3rem' }}>Your Language AI</h4>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Speak or type in English, Hindi, or Kannada with grounded answers.</p>
           </div>
         </div>
       </section>

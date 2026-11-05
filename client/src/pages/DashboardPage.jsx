@@ -17,11 +17,16 @@ import {
   Layers,
   ChevronRight,
   TrendingUp,
-  ShieldAlert
+  ShieldAlert,
+  ShieldCheck,
+  DollarSign,
+  Radar,
+  Truck,
+  FileText
 } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { farmer, activeCrop, t, isDemo } = useApp();
+  const { farmer, activeCrop, t, loadingFarmer } = useApp();
   const navigate = useNavigate();
 
   const [weather, setWeather] = useState(null);
@@ -32,15 +37,24 @@ export default function DashboardPage() {
   const [pestAlerts, setPestAlerts] = useState([]);
   const [selectedMissedTask, setSelectedMissedTask] = useState(null);
 
+  // If not logged in and not loading, redirect to login
+  useEffect(() => {
+    if (!loadingFarmer && !farmer) {
+      navigate('/login');
+    }
+  }, [farmer, loadingFarmer, navigate]);
+
   // Load weather, plan, and pest alerts
   useEffect(() => {
-    if (!farmer) return;
+    if (!farmer?.id) return;
 
     // 1. Weather
     const loadWeather = async () => {
       try {
         setLoadingWeather(true);
-        const res = await apiClient.get(`/weather?lat=${farmer.latitude}&lon=${farmer.longitude}`);
+        const lat = farmer.latitude || 12.5238;
+        const lon = farmer.longitude || 76.8967;
+        const res = await apiClient.get(`/weather?lat=${lat}&lon=${lon}`);
         if (res.success) setWeather(res.data);
       } catch (err) {
         console.error('Weather error:', err);
@@ -70,7 +84,7 @@ export default function DashboardPage() {
     // 3. Pest Alerts
     const loadPests = async () => {
       try {
-        const res = await apiClient.get(`/pest-alerts?district=${farmer.district}`);
+        const res = await apiClient.get(`/pest-alerts?district=${farmer.district || ''}`);
         if (res.success) setPestAlerts(res.data || []);
       } catch (e) {
         console.error('Pest alert error:', e);
@@ -80,7 +94,7 @@ export default function DashboardPage() {
     loadWeather();
     loadPlan();
     loadPests();
-  }, [farmer]);
+  }, [farmer?.id]);
 
   const toggleTask = async (taskId, currentStatus) => {
     try {
@@ -112,8 +126,16 @@ export default function DashboardPage() {
 
   const completedCount = tasks.filter(t => t.completed).length;
 
+  if (loadingFarmer) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 0', color: '#666' }}>
+        Loading farm profile...
+      </div>
+    );
+  }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: 1040, margin: '0 auto', padding: '0 16px' }}>
       {/* 1. Farmer Welcome Banner */}
       <div className="card" style={{
         background: 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)',
@@ -125,15 +147,15 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <div style={{ fontSize: '0.85rem', color: '#c8e6c9', fontWeight: 600 }}>
-              {t.dashboard.welcome}, {farmer?.name || 'Farmer Partner'}
+              {t.dashboard.welcome}, {farmer?.name || 'Farmer'}
             </div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: 800, marginTop: '0.2rem' }}>
               {farmer?.village ? `${farmer.village}, ` : ''}{farmer?.district}, {farmer?.state}
             </h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem', fontSize: '0.88rem', color: '#e8f5e9', flexWrap: 'wrap' }}>
-              <span>🌱 Active Crop: <strong>{activeCrop?.crop_name || 'Rice'}</strong> ({activeCrop?.variety || 'Local Standard'})</span>
-              <span>🌾 Farm Size: <strong>{farmer?.farms?.[0]?.area_acres || 2.5} {t.dashboard.acres}</strong></span>
-              <span>📅 {t.dashboard.sowingDate}: <strong>{activeCrop?.sowing_date || 'N/A'}</strong> ({daysAfterSowing} days ago)</span>
+              <span>🌱 Main Crop: <strong>{activeCrop?.crop_name || 'Rice (Paddy)'}</strong></span>
+              <span>🌾 Farm Area: <strong>{farmer?.farms?.[0]?.area_acres || 2.5} Acres</strong></span>
+              <span>📅 Sowing Date: <strong>{activeCrop?.sowing_date || 'N/A'}</strong> (Day {daysAfterSowing})</span>
             </div>
           </div>
 
@@ -149,12 +171,71 @@ export default function DashboardPage() {
             }}
           >
             <Bot size={18} />
-            <span>{t.dashboard.quickChat}</span>
+            <span>Chat in Your Language</span>
           </Link>
         </div>
       </div>
 
-      {/* 2. Regional Pest Alerts (if any in district) */}
+      {/* 2. Quick Action Hub for 4 New ML Modules */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1rem' }}>
+        <Link
+          to="/disease-identification"
+          className="card"
+          style={{ padding: 14, textDecoration: 'none', color: 'inherit', borderLeft: '4px solid #c62828', display: 'flex', alignItems: 'center', gap: 12 }}
+        >
+          <div style={{ background: '#ffebee', color: '#c62828', padding: 8, borderRadius: 8 }}>
+            <ShieldCheck size={22} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#b71c1c' }}>Disease Identification</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Scan leaf or symptoms</div>
+          </div>
+        </Link>
+
+        <Link
+          to="/market-prices"
+          className="card"
+          style={{ padding: 14, textDecoration: 'none', color: 'inherit', borderLeft: '4px solid #2e7d32', display: 'flex', alignItems: 'center', gap: 12 }}
+        >
+          <div style={{ background: '#e8f5e9', color: '#2e7d32', padding: 8, borderRadius: 8 }}>
+            <DollarSign size={22} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#1b5e20' }}>Mandi Prices & Trends</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>7-day ARIMA price forecast</div>
+          </div>
+        </Link>
+
+        <Link
+          to="/crop-lifecycle"
+          className="card"
+          style={{ padding: 14, textDecoration: 'none', color: 'inherit', borderLeft: '4px solid #0284c7', display: 'flex', alignItems: 'center', gap: 12 }}
+        >
+          <div style={{ background: '#e0f2fe', color: '#0284c7', padding: 8, borderRadius: 8 }}>
+            <Sprout size={22} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0369a1' }}>Full Crop Lifecycle</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Sowing, irrigation & fertilizer</div>
+          </div>
+        </Link>
+
+        <Link
+          to="/pest-radar"
+          className="card"
+          style={{ padding: 14, textDecoration: 'none', color: 'inherit', borderLeft: '4px solid #e65100', display: 'flex', alignItems: 'center', gap: 12 }}
+        >
+          <div style={{ background: '#fff3e0', color: '#e65100', padding: 8, borderRadius: 8 }}>
+            <Radar size={22} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#e65100' }}>Nearby Pest Radar</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>GPS outbreak alerts map</div>
+          </div>
+        </Link>
+      </div>
+
+      {/* 3. Regional Pest Alerts (if any in district) */}
       {pestAlerts.length > 0 && (
         <div style={{
           background: '#fff1f2',
@@ -168,38 +249,41 @@ export default function DashboardPage() {
           <ShieldAlert size={22} color="#e11d48" style={{ flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <strong style={{ color: '#9f1239', fontSize: '0.9rem' }}>
-              {t.dashboard.pestAlerts}: {pestAlerts[0].pest_or_disease} on {pestAlerts[0].crop_affected}
+              Pest Alert in {farmer?.district}: {pestAlerts[0].pest_or_disease} on {pestAlerts[0].crop_affected}
             </strong>
-            <p style={{ fontSize: '0.82rem', color: '#881337', marginTop: '2px' }}>
+            <p style={{ fontSize: '0.82rem', color: '#881337', marginTop: '2px', margin: 0 }}>
               {pestAlerts[0].alert_message}
             </p>
           </div>
+          <Link to="/pest-radar" className="btn-outline" style={{ fontSize: '0.75rem', padding: '4px 8px', flexShrink: 0 }}>
+            View Radar
+          </Link>
         </div>
       )}
 
-      {/* 3. Top Row: Growth Stage Progress & Weather Card */}
+      {/* 4. Top Row: Growth Stage Progress & Weather Card */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
         {/* Crop Growth Stage Progress Bar */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
               <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                {t.dashboard.currentStage}
+                Current Growth Stage
               </span>
               <span className="badge badge-success">Day {daysAfterSowing} of 130</span>
             </div>
 
             <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary-green)', marginBottom: '0.3rem' }}>
-              {stageInfo?.stageName || activeCrop?.growth_stage || 'Tillering Stage'}
+              {stageInfo?.stageName || activeCrop?.growth_stage || 'Active Field Stage'}
             </h3>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              Source: UAS Bangalore / ICAR Package of Practices
+              Source: ICAR Agronomic Package of Practices
             </p>
 
             {/* Interactive Progress Bar */}
             <div style={{ marginTop: '1.25rem', marginBottom: '0.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '0.3rem' }}>
-                <span>{t.dashboard.progress}</span>
+                <span>Lifecycle Progress</span>
                 <span>{progressPercent}% Complete</span>
               </div>
               <div style={{ height: '10px', background: '#e2ece3', borderRadius: '999px', overflow: 'hidden' }}>
@@ -216,10 +300,10 @@ export default function DashboardPage() {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--border-light)' }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Key Focus: Shallow water maintenance & nutrient uptake
+              Detailed Day-by-day Irrigation & Fertilizer Schedules
             </span>
-            <Link to="/crops" style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--primary-green)', display: 'flex', alignItems: 'center', gap: '2px' }}>
-              Details <ChevronRight size={15} />
+            <Link to="/crop-lifecycle" style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--primary-green)', display: 'flex', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
+              Full Timeline <ChevronRight size={15} />
             </Link>
           </div>
         </div>
@@ -228,24 +312,24 @@ export default function DashboardPage() {
         <WeatherCard weather={weather} loading={loadingWeather} />
       </div>
 
-      {/* 4. Signature Feature: Today's Action Plan Checklist */}
+      {/* 5. Signature Feature: Today's Action Plan Checklist */}
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.25rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-dark)' }}>
-              {t.dashboard.todayPlan}
+            <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-dark)', margin: 0 }}>
+              Today's Farming Action Plan
             </h2>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              Deterministic daily agronomic rules based on current crop stage & real-time weather
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
+              Personalized checklist based on crop stage & real-time weather telemetry
             </p>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span className="badge badge-success" style={{ fontSize: '0.8rem' }}>
-              {completedCount} / {tasks.length} {t.dashboard.completed}
+              {completedCount} / {tasks.length} Completed
             </span>
-            <Link to="/action-plan" className="btn-outline" style={{ fontSize: '0.82rem', padding: '0.4rem 0.8rem' }}>
-              {t.dashboard.viewAllTasks} <ArrowRight size={15} />
+            <Link to="/action-plan" className="btn-outline" style={{ fontSize: '0.82rem', padding: '0.4rem 0.8rem', textDecoration: 'none' }}>
+              View All Tasks <ArrowRight size={15} />
             </Link>
           </div>
         </div>
@@ -279,10 +363,12 @@ export default function DashboardPage() {
                   onClick={() => toggleTask(task.id, task.completed)}
                   style={{
                     background: 'none',
+                    border: 'none',
                     color: task.completed ? 'var(--primary-green)' : '#9ca3af',
                     marginTop: '2px',
                     display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    cursor: 'pointer'
                   }}
                   title={task.completed ? 'Mark pending' : 'Mark completed'}
                 >
@@ -320,48 +406,13 @@ export default function DashboardPage() {
                     className="btn-outline"
                     style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem', flexShrink: 0 }}
                   >
-                    {t.actionPlan.missedBtn}
+                    Missed Task?
                   </button>
                 )}
               </div>
             ))}
           </div>
         )}
-      </div>
-
-      {/* 5. Quick AI Agronomy Prompts */}
-      <div className="card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.75rem' }}>
-          <Bot size={22} color="var(--primary-green)" />
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-dark)' }}>
-            {t.dashboard.quickChat}
-          </h3>
-        </div>
-
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-          Ask in Kannada, Hindi, or English. Replies are automatically grounded in your {activeCrop?.crop_name} crop and today's weather.
-        </p>
-
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {t.ai.suggestedQuestions.map((q, idx) => (
-            <button
-              key={idx}
-              onClick={() => navigate('/ai-chat', { state: { prefilledQuestion: q } })}
-              style={{
-                background: '#f4faf5',
-                border: '1px solid #d4ebd6',
-                borderRadius: '20px',
-                padding: '0.45rem 0.85rem',
-                fontSize: '0.82rem',
-                color: 'var(--primary-green)',
-                fontWeight: 600,
-                textAlign: 'left'
-              }}
-            >
-              {q}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Missed Task Adaptive Recovery Modal */}

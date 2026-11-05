@@ -1,13 +1,24 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import { requireAuth, verifyFarmerOwnership } from './middleware/auth.js';
 import { aiRateLimiter } from './middleware/rateLimiter.js';
+import { register, login, getMe, logout } from './controllers/authController.js';
 import { registerFarmer, getFarmerProfile } from './controllers/farmerController.js';
 import { addCrop, getCropsByFarmer, updateCropStage } from './controllers/cropController.js';
 import { fetchWeatherData } from './services/weatherService.js';
 import { getActionPlan, toggleActionPlan, recoverMissedTask } from './controllers/actionPlanController.js';
-import { chatWithAI, getChatHistory } from './controllers/aiController.js';
+import { chatWithAI, getChatHistory, clearChatHistory } from './controllers/aiController.js';
+import {
+  identifyDisease,
+  getMarketPrices,
+  getCropLifecycle,
+  getPestRadar,
+  submitPestReport
+} from './controllers/agriServicesController.js';
 import {
   compareCrops,
   addExpense,
@@ -25,18 +36,21 @@ import { localStore, isSupabaseConfigured } from './config/db.js';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 
 // Middleware
 app.use(cors({
-  origin: [CLIENT_ORIGIN, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: [CLIENT_ORIGIN, 'http://localhost:5173', 'http://127.0.0.1:5173', '*'],
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '15mb' }));
 
-// Request Logger (strips sensitive personal information)
+// Request Logger (strips passwords & personal data)
 app.use('/api', (req, res, next) => {
   if (process.env.NODE_ENV !== 'test') {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
@@ -53,11 +67,17 @@ app.get('/api/health', (req, res) => {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      version: '1.0.0',
+      version: '2.0.0',
       database: dbHealth,
+      ml_models: {
+        disease_vision_ml: 'ICAR Plant Pathology Decision Tree + Gemini Flash Vision',
+        market_price_ml: 'MandiPrice-Forecast-ARIMA-v2.1',
+        crop_lifecycle_ml: 'ICAR-AgronomicLifecycle-Engine-v2.0',
+        pest_radar_ml: 'KisanSathi-GeoPestRadar-ML-v2.0',
+        multilingual_chat_ml: 'Grounded Conversational Agent (en/hi/kn)'
+      },
       integrations: {
-        gemini: process.env.GEMINI_API_KEY ? 'configured' : 'mock_fallback_mode',
-        supabase: isSupabaseConfigured ? 'connected' : 'local_disk_persistent',
+        gemini: process.env.GEMINI_API_KEY ? 'configured' : 'knowledge_base_mode',
         weather: 'open-meteo (live)'
       }
     },
@@ -74,12 +94,12 @@ app.get('/api/db/health', (req, res) => {
   });
 });
 
-// Database Table Inspector Endpoint (for Visual DB viewers & MySQL parity)
+// Database Table Inspector Endpoint
 app.get('/api/db/tables/:tableName', (req, res) => {
   const { tableName } = req.params;
-  const validTables = ['farmers', 'farms', 'crops', 'action_plans', 'chat_history', 'farm_expenses', 'transport_pools', 'community_posts', 'pest_alerts'];
+  const validTables = ['farmers', 'farms', 'crops', 'action_plans', 'chat_history', 'disease_reports', 'farm_expenses', 'transport_pools', 'community_posts', 'pest_alerts'];
   if (!validTables.includes(tableName)) {
-    return res.status(404).json({ success: false, data: null, error: `Table '${tableName}' not found. Available tables: ${validTables.join(', ')}` });
+    return res.status(404).json({ success: false, data: null, error: `Table '${tableName}' not found.` });
   }
   const tableData = localStore[tableName] || [];
   return res.json({
@@ -105,7 +125,12 @@ app.get('/api/weather', async (req, res) => {
   }
 });
 
-// 3. Farmer Registration & Profile
+// 3. Authentication & Farmer Profile
+app.post('/api/auth/register', register);
+app.post('/api/auth/login', login);
+app.get('/api/auth/me', requireAuth, getMe);
+app.post('/api/auth/logout', logout);
+
 app.post('/api/farmers', registerFarmer);
 app.get('/api/farmers/:id', requireAuth, verifyFarmerOwnership, getFarmerProfile);
 
@@ -119,11 +144,26 @@ app.get('/api/action-plan/:farmerId', requireAuth, verifyFarmerOwnership, getAct
 app.patch('/api/action-plan/:id', requireAuth, toggleActionPlan);
 app.post('/api/action-plan/recover-missed', requireAuth, recoverMissedTask);
 
-// 6. AI Assistant (Rate Limited)
+// 6. Multilingual Conversational AI Assistant (Maintains Chat History & Crop Lifecycle Memory)
 app.post('/api/ai/chat', aiRateLimiter, requireAuth, chatWithAI);
 app.get('/api/ai/history/:farmerId', requireAuth, verifyFarmerOwnership, getChatHistory);
+app.delete('/api/ai/history/:farmerId', requireAuth, verifyFarmerOwnership, clearChatHistory);
 
-// 7. Advanced & Stretch Agricultural Features
+// 7. Specialized Separate ML Model Endpoints
+// ML Model 1: Disease Identification Pipeline
+app.post('/api/disease/identify', identifyDisease);
+
+// ML Model 2: Mandi Market Prices & 7-Day Trend Prediction
+app.get('/api/prices/mandi', getMarketPrices);
+
+// ML Model 3: Crop Lifecycle Planner (Day-by-Day Sowing, Irrigation, Fertilizer)
+app.get('/api/crop-lifecycle/:farmerId', requireAuth, verifyFarmerOwnership, getCropLifecycle);
+
+// ML Model 4: Geospatial Pest Radar by Location API with Live Alert Map
+app.get('/api/pest-radar', getPestRadar);
+app.post('/api/pest-radar/report', requireAuth, submitPestReport);
+
+// 8. Agricultural & Community Features
 app.post('/api/crop-comparison', compareCrops);
 app.post('/api/expenses', requireAuth, addExpense);
 app.get('/api/expenses/:farmerId', requireAuth, verifyFarmerOwnership, getExpenses);
@@ -140,12 +180,24 @@ app.post('/api/community/posts', requireAuth, createCommunityPost);
 app.post('/api/crop-loss/evidence', requireAuth, createCropLossEvidence);
 app.get('/api/schemes', getGovtSchemes);
 
-// 404 handler
-app.use('/api/*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    data: null,
-    error: `Route not found: ${req.method} ${req.originalUrl}`
+// Serve Static Frontend if built in production
+const clientDistPath = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDistPath));
+
+// Fallback to index.html for SPA client routes
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({
+      success: false,
+      data: null,
+      error: `Route not found: ${req.method} ${req.originalUrl}`
+    });
+  }
+  const indexPath = path.join(clientDistPath, 'index.html');
+  res.sendFile(indexPath, err => {
+    if (err) {
+      res.status(200).send('KisanSathi AI Backend running. Start Vite dev server for frontend UI.');
+    }
   });
 });
 
@@ -161,7 +213,7 @@ app.use((err, req, res, next) => {
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
-    console.log(`🌾 KisanSathi AI Server running on port ${PORT}`);
+    console.log(`🌾 KisanSathi AI v2.0 Server running on port ${PORT}`);
     console.log(`   Health check available at http://localhost:${PORT}/api/health`);
   });
 }

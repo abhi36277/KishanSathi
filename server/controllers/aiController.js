@@ -1,9 +1,13 @@
-import { getGeminiReply } from '../services/geminiService.js';
-import { supabase, isSupabaseConfigured, localStore } from '../config/db.js';
-import { calculateGrowthStage } from '../utils/stageCalculator.js';
+import { generateMultilingualReply } from '../services/multilingualChatML.js';
+import { calculateFullCropLifecycle } from '../services/cropLifecycleML.js';
 import { fetchWeatherData } from '../services/weatherService.js';
+import { supabase, isSupabaseConfigured, localStore } from '../config/db.js';
 import crypto from 'crypto';
 
+/**
+ * Multilingual Context-Aware AI Chatbot
+ * Enforces per-farmer memory, plant lifecycle stage grounding, and persistent chat history.
+ */
 export async function chatWithAI(req, res) {
   try {
     const { farmerId, message, language } = req.body;
@@ -12,7 +16,7 @@ export async function chatWithAI(req, res) {
       return res.status(400).json({ success: false, data: null, error: 'farmerId and message are required' });
     }
 
-    // 1. Gather context
+    // 1. Gather Farmer & Crop Context
     let farmer = null;
     let crop = null;
 
@@ -28,41 +32,56 @@ export async function chatWithAI(req, res) {
       crop = localStore.crops.filter(c => c.farmer_id === farmerId).pop() || null;
     }
 
-    const stage = crop
-      ? calculateGrowthStage(crop.crop_name, crop.sowing_date, farmer?.state || 'Karnataka', crop.growth_stage)
-      : null;
-
-    const weather = farmer
-      ? await fetchWeatherData(farmer.latitude, farmer.longitude)
-      : null;
-
-    let tasks = [];
+    // 2. Compute Plant Lifecycle Model Context
+    let lifecycle = null;
     if (crop) {
-      if (isSupabaseConfigured) {
-        const { data } = await supabase.from('action_plans').select('*').eq('crop_id', crop.id).limit(5);
-        tasks = data || [];
-      } else {
-        tasks = localStore.action_plans.filter(p => p.crop_id === crop.id).slice(0, 5);
-      }
+      lifecycle = await calculateFullCropLifecycle({
+        cropName: crop.crop_name,
+        sowingDate: crop.sowing_date,
+        farmerLocation: farmer?.state || 'Karnataka'
+      });
     }
 
-    // 2. Query Gemini / Knowledge Base
-    const aiResult = await getGeminiReply({
+    // 3. Fetch Real-time Open-Meteo Weather Telemetry
+    let weather = null;
+    if (farmer && farmer.latitude && farmer.longitude) {
+      weather = await fetchWeatherData(farmer.latitude, farmer.longitude);
+    }
+
+    // 4. Retrieve Farmer's Recent Chat History
+    let recentHistory = [];
+    if (isSupabaseConfigured) {
+      const { data } = await supabase
+        .from('chat_history')
+        .select('*')
+        .eq('farmer_id', farmerId)
+        .order('created_at', { ascending: true })
+        .limit(10);
+      recentHistory = data || [];
+    } else {
+      recentHistory = localStore.chat_history
+        .filter(h => h.farmer_id === farmerId)
+        .slice(-10);
+    }
+
+    // 5. Query Multilingual Conversational Model
+    const targetLanguage = language || farmer?.language || 'en';
+    const aiResult = await generateMultilingualReply({
       farmer,
       crop,
-      stage,
+      lifecycle,
       weather,
-      tasks,
+      recentHistory,
       userMessage: message,
-      language: language || farmer?.language || 'en'
+      language: targetLanguage
     });
 
-    // 3. Save to chat history
+    // 6. Persist Conversation to Database
     const userMsgRecord = {
       id: crypto.randomUUID(),
       farmer_id: farmerId,
       role: 'user',
-      message,
+      message: message.trim(),
       created_at: new Date().toISOString()
     };
 
@@ -78,6 +97,7 @@ export async function chatWithAI(req, res) {
       await supabase.from('chat_history').insert([userMsgRecord, aiMsgRecord]);
     } else {
       localStore.chat_history.push(userMsgRecord, aiMsgRecord);
+      localStore.save();
     }
 
     return res.json({
@@ -85,12 +105,21 @@ export async function chatWithAI(req, res) {
       data: {
         reply: aiResult.reply,
         source: aiResult.source,
+        language: aiResult.language,
         timestamp: aiResult.timestamp,
-        contextUsed: {
+        plant_lifecycle_context: {
           crop: crop?.crop_name,
-          stage: stage?.stageName,
-          weatherAvailable: !weather?.isFallback
-        }
+          sowing_date: crop?.sowing_date,
+          days_after_sowing: lifecycle?.days_after_sowing,
+          stage: lifecycle?.current_stage?.name,
+          next_irrigation: lifecycle?.upcoming_milestones?.next_irrigation_due,
+          next_fertilizer: lifecycle?.upcoming_milestones?.next_fertilizer_target
+        },
+        weather_telemetry: weather ? {
+          temp: weather.current?.temperature,
+          condition: weather.current?.condition,
+          rain_prob: weather.forecast?.[0]?.precipitation_probability
+        } : null
       },
       error: null
     });
@@ -100,6 +129,9 @@ export async function chatWithAI(req, res) {
   }
 }
 
+/**
+ * Retrieve Complete Chat History for a Farmer
+ */
 export async function getChatHistory(req, res) {
   try {
     const { farmerId } = req.params;
@@ -115,8 +147,31 @@ export async function getChatHistory(req, res) {
       return res.json({ success: true, data: data || [], error: null });
     }
 
-    const history = localStore.chat_history.filter(h => h.farmer_id === farmerId);
+    const history = localStore.chat_history
+      .filter(h => h.farmer_id === farmerId)
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
     return res.json({ success: true, data: history, error: null });
+  } catch (error) {
+    return res.status(500).json({ success: false, data: null, error: error.message });
+  }
+}
+
+/**
+ * Clear Chat History for a Farmer
+ */
+export async function clearChatHistory(req, res) {
+  try {
+    const { farmerId } = req.params;
+
+    if (isSupabaseConfigured) {
+      await supabase.from('chat_history').delete().eq('farmer_id', farmerId);
+    } else {
+      localStore.chat_history = localStore.chat_history.filter(h => h.farmer_id !== farmerId);
+      localStore.save();
+    }
+
+    return res.json({ success: true, message: 'Chat history cleared successfully', error: null });
   } catch (error) {
     return res.status(500).json({ success: false, data: null, error: error.message });
   }

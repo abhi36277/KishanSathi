@@ -1,18 +1,16 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
-import { Sprout, ClipboardList, CloudSun, Bot, LayoutGrid } from 'lucide-react';
+import { Sprout, ClipboardList, Bot, ShieldCheck, DollarSign } from 'lucide-react';
 
 export default function MobileTabBar() {
-  const { t } = useApp();
   const location = useLocation();
 
   const tabs = [
-    { path: '/dashboard', label: t.nav.dashboard, icon: Sprout },
-    { path: '/action-plan', label: t.nav.actionPlan, icon: ClipboardList },
-    { path: '/weather', label: t.nav.weather, icon: CloudSun },
-    { path: '/ai-chat', label: t.nav.aiChat, icon: Bot },
-    { path: '/crop-decider', label: t.nav.compareCrops, icon: LayoutGrid }
+    { path: '/dashboard', label: 'Dashboard', icon: Sprout },
+    { path: '/action-plan', label: 'Action Plan', icon: ClipboardList },
+    { path: '/disease-identification', label: 'Disease ID', icon: ShieldCheck },
+    { path: '/market-prices', label: 'Mandi Rates', icon: DollarSign },
+    { path: '/ai-chat', label: 'AI Chat', icon: Bot }
   ];
 
   return (

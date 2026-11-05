@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -10,21 +10,16 @@ const apiClient = axios.create({
   }
 });
 
-// Request interceptor to attach JWT or Demo flag
+// Request interceptor to attach Bearer token
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('kisansathi_token');
-  const isDemo = localStorage.getItem('kisansathi_is_demo') === 'true';
-
-  if (isDemo) {
-    config.headers['x-demo-user'] = 'true';
-  } else if (token) {
+  if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
-
   return config;
 }, (error) => Promise.reject(error));
 
-// Response interceptor for consistent error extraction
+// Response interceptor for consistent data & error extraction
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {

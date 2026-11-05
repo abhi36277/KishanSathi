@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { 
   Sprout, 
@@ -8,34 +8,45 @@ import {
   Bot, 
   Scale, 
   Wallet, 
-  ShieldAlert, 
+  ShieldCheck, 
   Landmark, 
   Truck, 
   Users, 
   Menu, 
   X,
   Globe,
-  Sparkles,
-  Database
+  Database,
+  Radar,
+  DollarSign,
+  LogOut,
+  UserCheck
 } from 'lucide-react';
 
 export default function Navbar() {
-  const { language, changeLanguage, t, isDemo, farmer, startDemoMode, logout } = useApp();
+  const { language, changeLanguage, t, farmer, logout } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const navItems = [
-    { path: '/dashboard', label: t.nav.dashboard, icon: Sprout },
-    { path: '/action-plan', label: t.nav.actionPlan, icon: ClipboardList },
-    { path: '/weather', label: t.nav.weather, icon: CloudSun },
-    { path: '/ai-chat', label: t.nav.aiChat, icon: Bot },
-    { path: '/database', label: 'Database', icon: Database },
-    { path: '/crop-decider', label: t.nav.compareCrops, icon: Scale },
-    { path: '/expenses', label: t.nav.expenses, icon: Wallet },
-    { path: '/field-monitor', label: t.nav.fieldMonitor, icon: ShieldAlert },
-    { path: '/schemes', label: t.nav.schemes, icon: Landmark },
-    { path: '/transport', label: t.nav.transport, icon: Truck },
-    { path: '/community', label: t.nav.community, icon: Users }
+    { path: '/dashboard', label: 'Dashboard', icon: Sprout },
+    { path: '/action-plan', label: 'Action Plan', icon: ClipboardList },
+    { path: '/disease-identification', label: 'Disease ID', icon: ShieldCheck },
+    { path: '/market-prices', label: 'Mandi Prices', icon: DollarSign },
+    { path: '/crop-lifecycle', label: 'Lifecycle', icon: Sprout },
+    { path: '/pest-radar', label: 'Pest Radar', icon: Radar },
+    { path: '/ai-chat', label: 'AI Assistant', icon: Bot },
+    { path: '/weather', label: 'Weather', icon: CloudSun },
+    { path: '/schemes', label: 'Govt Schemes', icon: Landmark },
+    { path: '/transport', label: 'Transport Pool', icon: Truck },
+    { path: '/community', label: 'Community', icon: Users },
+    { path: '/expenses', label: 'Expenses', icon: Wallet },
+    { path: '/database', label: 'Database', icon: Database }
   ];
 
   return (
@@ -54,14 +65,14 @@ export default function Navbar() {
             <Sprout size={24} />
           </div>
           <div>
-            <div style={{ lineHeight: 1.1 }}>{t.appName}</div>
+            <div style={{ lineHeight: 1.1, fontWeight: 800 }}>KisanSathi AI</div>
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-              {t.tagline}
+              Your Farm. Your Language. Your AI Partner.
             </div>
           </div>
         </Link>
 
-        {/* Desktop Nav Items */}
+        {/* Desktop Quick Nav Links */}
         <div className="nav-links">
           {navItems.slice(0, 5).map(item => {
             const Icon = item.icon;
@@ -80,8 +91,8 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Right Action Bar: Language Selector & Demo Status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {/* Right Action Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           {/* Always Visible Language Selector */}
           <div style={{ display: 'flex', alignItems: 'center', background: '#eef5ef', borderRadius: '8px', padding: '2px 6px' }}>
             <Globe size={15} style={{ marginRight: '4px', color: 'var(--primary-green)' }} />
@@ -105,29 +116,49 @@ export default function Navbar() {
             </select>
           </div>
 
-          {/* Demo Mode Toggle / Status */}
-          {isDemo ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span className="badge badge-success" style={{ fontSize: '0.7rem' }}>
-                <Sparkles size={12} /> {t.nav.demoMode}
+          {/* Farmer Auth Status */}
+          {farmer ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: '#1b5e20',
+                background: '#e8f5e9',
+                padding: '4px 8px',
+                borderRadius: 6,
+                maxWidth: 120,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                🌾 {farmer.name.split(' ')[0]}
               </span>
-              <button 
-                onClick={logout} 
-                className="btn-outline" 
-                style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
-                title="Exit Demo Mode"
+              <button
+                onClick={handleLogout}
+                className="btn-outline"
+                style={{ padding: '0.35rem 0.6rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 4 }}
+                title="Logout"
               >
-                {t.nav.logout}
+                <LogOut size={13} /> Logout
               </button>
             </div>
           ) : (
-            <button 
-              onClick={() => startDemoMode('karnataka')} 
-              className="btn-secondary" 
-              style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem' }}
-            >
-              <Sparkles size={14} /> {t.nav.demoMode}
-            </button>
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
+              <Link
+                to="/login"
+                className="btn-secondary"
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', textDecoration: 'none' }}
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="btn-primary"
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', textDecoration: 'none' }}
+              >
+                Register
+              </Link>
+            </div>
           )}
 
           {/* Mobile Menu Hamburger */}
@@ -136,7 +167,9 @@ export default function Navbar() {
             style={{
               background: 'none',
               padding: '6px',
+              border: 'none',
               color: 'var(--text-dark)',
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center'
             }}
@@ -147,7 +180,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Expanded Mobile / Desktop Flyout Menu */}
+      {/* Expanded Flyout Menu for all features */}
       {mobileMenuOpen && (
         <div style={{
           position: 'absolute',
@@ -183,7 +216,8 @@ export default function Navbar() {
                     background: location.pathname === item.path ? 'var(--primary-green-subtle)' : '#fafbfa',
                     color: location.pathname === item.path ? 'var(--primary-green)' : 'var(--text-dark)',
                     fontWeight: 600,
-                    fontSize: '0.88rem'
+                    fontSize: '0.88rem',
+                    textDecoration: 'none'
                   }}
                 >
                   <Icon size={18} />
@@ -191,20 +225,6 @@ export default function Navbar() {
                 </Link>
               );
             })}
-          </div>
-          
-          <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Pilot Regions: Karnataka (Rice, Maize) & Punjab (Wheat)
-            </span>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button onClick={() => { startDemoMode('karnataka'); setMobileMenuOpen(false); }} className="btn-outline" style={{ fontSize: '0.75rem' }}>
-                Mandya Rice Demo
-              </button>
-              <button onClick={() => { startDemoMode('punjab'); setMobileMenuOpen(false); }} className="btn-outline" style={{ fontSize: '0.75rem' }}>
-                Punjab Wheat Demo
-              </button>
-            </div>
           </div>
         </div>
       )}

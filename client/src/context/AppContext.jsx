@@ -6,10 +6,10 @@ const AppContext = createContext(null);
 
 export const AppProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => localStorage.getItem('kisansathi_lang') || 'en');
-  const [isDemo, setIsDemo] = useState(() => localStorage.getItem('kisansathi_is_demo') === 'true');
   const [farmer, setFarmer] = useState(null);
   const [activeCrop, setActiveCrop] = useState(null);
   const [loadingFarmer, setLoadingFarmer] = useState(true);
+  const [authError, setAuthError] = useState(null);
 
   // Helper for i18n
   const t = translations[language] || translations.en;
@@ -19,55 +19,85 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('kisansathi_lang', newLang);
   };
 
-  const loadFarmerProfile = async (farmerId, isDemoMode = false) => {
+  const loadFarmerProfile = async () => {
+    const token = localStorage.getItem('kisansathi_token');
+    if (!token) {
+      setFarmer(null);
+      setActiveCrop(null);
+      setLoadingFarmer(false);
+      return;
+    }
+
     try {
       setLoadingFarmer(true);
-      const res = await apiClient.get(`/farmers/${farmerId}`);
-      if (res.success && res.data) {
-        setFarmer(res.data);
+      const res = await apiClient.get('/auth/me');
+      if (res.success && res.data?.farmer) {
+        setFarmer(res.data.farmer);
         if (res.data.crops && res.data.crops.length > 0) {
           setActiveCrop(res.data.crops[0]);
         }
+      } else {
+        logout();
       }
     } catch (err) {
-      console.error('Failed to load farmer profile:', err);
+      console.warn('Session expired or profile fetch failed:', err.message);
+      logout();
     } finally {
       setLoadingFarmer(false);
     }
   };
 
-  const startDemoMode = async (pilotRegion = 'karnataka') => {
-    const demoId = pilotRegion === 'punjab' 
-      ? '00000000-0000-0000-0000-000000000004'
-      : '00000000-0000-0000-0000-000000000001';
+  const login = async (phone, password) => {
+    try {
+      setAuthError(null);
+      const res = await apiClient.post('/auth/login', { phone, password });
+      if (res.success && res.data?.token) {
+        localStorage.setItem('kisansathi_token', res.data.token);
+        localStorage.setItem('kisansathi_farmer_id', res.data.farmer.id);
+        setFarmer(res.data.farmer);
+        if (res.data.crops && res.data.crops.length > 0) {
+          setActiveCrop(res.data.crops[0]);
+        }
+        return { success: true };
+      }
+      return { success: false, error: res.error || 'Login failed' };
+    } catch (err) {
+      const errorMsg = err.message || 'Login failed';
+      setAuthError(errorMsg);
+      return { success: false, error: errorMsg };
+    }
+  };
 
-    localStorage.setItem('kisansathi_is_demo', 'true');
-    localStorage.setItem('kisansathi_token', 'demo-token');
-    localStorage.setItem('kisansathi_farmer_id', demoId);
-    setIsDemo(true);
-    await loadFarmerProfile(demoId, true);
+  const registerFarmerAccount = async (formData) => {
+    try {
+      setAuthError(null);
+      const res = await apiClient.post('/auth/register', formData);
+      if (res.success && res.data?.token) {
+        localStorage.setItem('kisansathi_token', res.data.token);
+        localStorage.setItem('kisansathi_farmer_id', res.data.farmer.id);
+        setFarmer(res.data.farmer);
+        if (res.data.crop) {
+          setActiveCrop(res.data.crop);
+        }
+        return { success: true };
+      }
+      return { success: false, error: res.error || 'Registration failed' };
+    } catch (err) {
+      const errorMsg = err.message || 'Registration failed';
+      setAuthError(errorMsg);
+      return { success: false, error: errorMsg };
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem('kisansathi_is_demo');
     localStorage.removeItem('kisansathi_token');
     localStorage.removeItem('kisansathi_farmer_id');
-    setIsDemo(false);
     setFarmer(null);
     setActiveCrop(null);
   };
 
-  // Initial load
   useEffect(() => {
-    const savedId = localStorage.getItem('kisansathi_farmer_id');
-    const savedDemo = localStorage.getItem('kisansathi_is_demo') === 'true';
-
-    if (savedId) {
-      loadFarmerProfile(savedId, savedDemo);
-    } else {
-      // Default to demo farmer for frictionless hackathon exploration
-      startDemoMode('karnataka');
-    }
+    loadFarmerProfile();
   }, []);
 
   return (
@@ -76,12 +106,13 @@ export const AppProvider = ({ children }) => {
         language,
         changeLanguage,
         t,
-        isDemo,
         farmer,
         activeCrop,
         setActiveCrop,
         loadingFarmer,
-        startDemoMode,
+        authError,
+        login,
+        registerFarmerAccount,
         loadFarmerProfile,
         logout
       }}

@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import apiClient from '../services/api';
-import { MapPin, Sparkles, Sprout, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { MapPin, Sprout, ArrowRight, Lock, Phone } from 'lucide-react';
 
 export default function RegistrationPage() {
-  const { t, changeLanguage, startDemoMode, loadFarmerProfile } = useApp();
+  const { changeLanguage, registerFarmerAccount } = useApp();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
+    password: '',
     state: 'Karnataka',
     district: 'Mandya',
     village: '',
     language: 'kn',
     area_acres: '2.5',
     soil_type: 'Red Sandy Loam',
-    crop_name: 'Rice',
+    crop_name: 'Rice (Paddy)',
     sowing_date: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0],
-    variety: 'JGL 1798 (Paddy)',
+    variety: 'Jyothi / Sona Masoori',
     latitude: 12.5238,
     longitude: 76.8967
   });
@@ -43,7 +43,7 @@ export default function RegistrationPage() {
         ...prev,
         state: 'Karnataka',
         district: 'Mandya',
-        crop_name: 'Rice',
+        crop_name: 'Rice (Paddy)',
         latitude: 12.5238,
         longitude: 76.8967,
         language: 'kn'
@@ -87,7 +87,7 @@ export default function RegistrationPage() {
         setGeoStatus(`GPS detected: ${pos.coords.latitude.toFixed(2)}°N, ${pos.coords.longitude.toFixed(2)}°E`);
       },
       (err) => {
-        setGeoStatus(`Location access denied or timed out (${err.message}). Using regional district coordinates.`);
+        setGeoStatus(`Location access denied or timed out (${err.message}). Using regional coordinates.`);
       },
       { timeout: 8000 }
     );
@@ -97,8 +97,8 @@ export default function RegistrationPage() {
     e.preventDefault();
     setError('');
 
-    if (!formData.name || !formData.state || !formData.district || !formData.crop_name) {
-      setError('Please fill in all required fields.');
+    if (!formData.name || !formData.phone || !formData.password || !formData.crop_name) {
+      setError('Please fill in your name, mobile number, security PIN, and crop.');
       return;
     }
 
@@ -107,6 +107,7 @@ export default function RegistrationPage() {
       const payload = {
         name: formData.name,
         phone: formData.phone,
+        password: formData.password,
         state: formData.state,
         district: formData.district,
         village: formData.village,
@@ -120,13 +121,11 @@ export default function RegistrationPage() {
         variety: formData.variety
       };
 
-      const res = await apiClient.post('/farmers', payload);
-      if (res.success && res.data) {
-        localStorage.setItem('kisansathi_is_demo', 'false');
-        localStorage.setItem('kisansathi_token', res.data.token || res.data.farmer.id);
-        localStorage.setItem('kisansathi_farmer_id', res.data.farmer.id);
-        await loadFarmerProfile(res.data.farmer.id, false);
+      const res = await registerFarmerAccount(payload);
+      if (res.success) {
         navigate('/dashboard');
+      } else {
+        setError(res.error || 'Registration failed');
       }
     } catch (err) {
       setError(err.message || 'Registration failed');
@@ -136,25 +135,32 @@ export default function RegistrationPage() {
   };
 
   return (
-    <div style={{ maxWidth: '680px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '680px', margin: '24px auto', padding: '0 16px' }}>
       <div className="card" style={{ padding: '2rem 1.5rem', borderTop: '4px solid var(--primary-green)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary-green)' }}>
-              Register Your Farm Profile
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary-green)', margin: '0 0 4px 0' }}>
+              Register Your Farm Account
             </h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Get your custom daily farming plan and hyperlocal weather advisories
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
+              Create your farmer profile to get customized daily action plans & alerts
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => { startDemoMode('karnataka'); navigate('/dashboard'); }}
-            className="btn-secondary"
-            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+          <Link
+            to="/login"
+            className="btn"
+            style={{
+              fontSize: '0.82rem',
+              padding: '6px 12px',
+              background: '#e8f5e9',
+              color: '#2e7d32',
+              textDecoration: 'none',
+              borderRadius: 6,
+              fontWeight: 600
+            }}
           >
-            <Sparkles size={14} /> Try Demo Instead
-          </button>
+            Already Registered? Login
+          </Link>
         </div>
 
         {error && (
@@ -167,7 +173,7 @@ export default function RegistrationPage() {
           {/* Section 1: Farmer Identity */}
           <div style={{ marginBottom: '1.25rem' }}>
             <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-dark)', marginBottom: '0.75rem' }}>
-              1. Farmer Information
+              1. Farmer Identity & Login Details
             </h4>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
@@ -185,40 +191,54 @@ export default function RegistrationPage() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Mobile Number (Optional)</label>
+                <label className="form-label">Mobile Number *</label>
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="+91 9876543210"
+                  required
+                  placeholder="9876543210"
                   value={formData.phone}
                   onChange={handleChange}
                   className="form-input"
                 />
               </div>
-            </div>
 
-            <div className="form-group">
-              <label className="form-label">Preferred Language</label>
-              <select name="language" value={formData.language} onChange={handleChange} className="form-select">
-                <option value="en">English</option>
-                <option value="hi">हिंदी (Hindi)</option>
-                <option value="kn">ಕನ್ನಡ (Kannada)</option>
-              </select>
+              <div className="form-group">
+                <label className="form-label">Set Login PIN / Password *</label>
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  placeholder="e.g. 1234"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Preferred Language *</label>
+                <select name="language" value={formData.language} onChange={handleChange} className="form-select">
+                  <option value="en">English</option>
+                  <option value="hi">हिंदी (Hindi)</option>
+                  <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          {/* Section 2: Location & Coordinates */}
+          {/* Section 2: Farm Location */}
           <div style={{ marginBottom: '1.25rem' }}>
             <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-dark)', marginBottom: '0.75rem' }}>
-              2. Farm Location (For Real-Time Weather)
+              2. Location & Field Coordinates
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
               <div className="form-group">
                 <label className="form-label">State *</label>
                 <select name="state" value={formData.state} onChange={handleStateChange} className="form-select">
                   <option value="Karnataka">Karnataka (Pilot Region)</option>
-                  <option value="Punjab">Punjab (Pilot Region)</option>
+                  <option value="Punjab">Punjab (Wheat Belt)</option>
                   <option value="Haryana">Haryana</option>
                   <option value="Maharashtra">Maharashtra</option>
                   <option value="Uttar Pradesh">Uttar Pradesh</option>
@@ -238,7 +258,7 @@ export default function RegistrationPage() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Village / Hobli</label>
+                <label className="form-label">Village / Taluk</label>
                 <input
                   type="text"
                   name="village"
@@ -250,39 +270,40 @@ export default function RegistrationPage() {
               </div>
             </div>
 
-            {/* Geolocation Button */}
-            <div style={{ marginTop: '0.25rem', marginBottom: '0.75rem' }}>
+            <div style={{ background: 'var(--bg-light)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>GPS Field Coordinates</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  {formData.latitude}°N, {formData.longitude}°E
+                </div>
+                {geoStatus && <div style={{ fontSize: '0.75rem', color: '#16a34a', marginTop: '2px' }}>{geoStatus}</div>}
+              </div>
               <button
                 type="button"
                 onClick={detectLocation}
-                className="btn-outline"
-                style={{ fontSize: '0.82rem', padding: '0.4rem 0.8rem' }}
+                className="btn-secondary"
+                style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
               >
-                <MapPin size={15} /> Detect GPS Coordinates
+                <MapPin size={14} /> Detect via GPS
               </button>
-              {geoStatus && (
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
-                  {geoStatus}
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Section 3: Farm & Active Crop */}
+          {/* Section 3: Farm & Crop Details */}
           <div style={{ marginBottom: '1.5rem' }}>
             <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-dark)', marginBottom: '0.75rem' }}>
-              3. Farm Area & Current Crop
+              3. Land Area & Crop Details
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
               <div className="form-group">
                 <label className="form-label">Farm Size (Acres) *</label>
                 <input
                   type="number"
                   step="0.1"
                   min="0.1"
-                  required
                   name="area_acres"
+                  required
                   value={formData.area_acres}
                   onChange={handleChange}
                   className="form-input"
@@ -290,28 +311,29 @@ export default function RegistrationPage() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Soil Type</label>
+                <label className="form-label">Soil Type *</label>
                 <select name="soil_type" value={formData.soil_type} onChange={handleChange} className="form-select">
                   <option value="Red Sandy Loam">Red Sandy Loam</option>
-                  <option value="Black Cotton Soil">Black Cotton Soil</option>
-                  <option value="Alluvial Loam">Alluvial Loam</option>
-                  <option value="Clayey Soil">Clayey Soil</option>
+                  <option value="Black Cotton Soil">Black Cotton Soil (Regur)</option>
+                  <option value="Alluvial Soil">Alluvial Soil</option>
+                  <option value="Clayey Loam">Clayey Loam</option>
+                  <option value="Laterite Soil">Laterite Soil</option>
                 </select>
               </div>
-            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
               <div className="form-group">
                 <label className="form-label">Main Crop *</label>
                 <select name="crop_name" value={formData.crop_name} onChange={handleChange} className="form-select">
-                  <option value="Rice">Rice (Paddy)</option>
-                  <option value="Wheat">Wheat</option>
-                  <option value="Maize">Maize (Corn)</option>
+                  <option value="Rice (Paddy)">Rice / Paddy (ಭತ್ತ / धान)</option>
+                  <option value="Wheat">Wheat (ಗೋಧಿ / गेहूं)</option>
+                  <option value="Maize">Maize (ಮೆಕ್ಕೆಜೋಳ / मक्का)</option>
+                  <option value="Tomatoes">Tomatoes (ಟೊಮ್ಯಾಟೊ / टमाटर)</option>
+                  <option value="Chillies">Chillies (ಮೆಣಸಿನಕಾಯಿ / मिर्च)</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Sowing Date *</label>
+                <label className="form-label">Sowing / Transplanting Date *</label>
                 <input
                   type="date"
                   name="sowing_date"
@@ -322,12 +344,12 @@ export default function RegistrationPage() {
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Variety</label>
+              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                <label className="form-label">Crop Variety (Optional)</label>
                 <input
                   type="text"
                   name="variety"
-                  placeholder="e.g. JGL 1798 / PBW 550"
+                  placeholder="e.g. Jyothi, Sona Masoori, HD-2967, Pioneer Hybrid"
                   value={formData.variety}
                   onChange={handleChange}
                   className="form-input"
@@ -338,11 +360,15 @@ export default function RegistrationPage() {
 
           <button
             type="submit"
-            disabled={loading}
             className="btn-primary"
-            style={{ width: '100%', padding: '0.85rem', fontSize: '1rem' }}
+            disabled={loading}
+            style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', fontWeight: 700 }}
           >
-            {loading ? 'Creating Farm Profile...' : 'Complete Registration & Open Dashboard'}
+            {loading ? 'Creating Your Profile...' : (
+              <>
+                <Sprout size={18} /> Register & Generate Farming Plan <ArrowRight size={18} />
+              </>
+            )}
           </button>
         </form>
       </div>

@@ -12,7 +12,8 @@
       "latitude": 12.5238,
       "longitude": 76.8967,
       "is_demo": true,
-      "created_at": "2026-11-05T10:47:32.102Z"
+      "created_at": "2026-11-05T10:47:32.102Z",
+      "session_token": "session-5d3961f9-fe95-4f84-8a0c-065fe376f28c"
     },
     {
       "id": "00000000-0000-0000-0000-000000000004",
@@ -41,6 +42,22 @@
       "longitude": 76.68,
       "is_demo": false,
       "created_at": "2026-11-05T10:48:48.928Z"
+    },
+    {
+      "id": "2a73c9f4-501c-4efb-ad60-fe9b2d2a2652",
+      "auth_user_id": "61952bc2-02eb-4523-8123-d47afc0de4a3",
+      "name": "Arjun Verma",
+      "phone": "+919830239297",
+      "password_hash": "d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1",
+      "session_token": "session-4e243f7c-86a1-4c18-a21f-c581a8b8141d",
+      "state": "Punjab",
+      "district": "Ludhiana",
+      "village": "Samrala",
+      "language": "hi",
+      "latitude": 30.901,
+      "longitude": 75.857,
+      "is_demo": false,
+      "created_at": "2026-11-05T18:14:27.162Z"
     }
   ],
   "farms": [
@@ -64,6 +81,13 @@
       "area_acres": 3,
       "soil_type": "Red Sandy Loam",
       "created_at": "2026-11-05T10:48:48.928Z"
+    },
+    {
+      "id": "d546e629-891e-4f58-8d5c-17861e8b696b",
+      "farmer_id": "2a73c9f4-501c-4efb-ad60-fe9b2d2a2652",
+      "area_acres": 3.5,
+      "soil_type": "Alluvial Loam",
+      "created_at": "2026-11-05T18:14:27.162Z"
     }
   ],
   "crops": [
@@ -93,10 +117,95 @@
       "variety": "Standard Variety",
       "growth_stage": "Germination / Early Vegetative",
       "created_at": "2026-11-05T10:48:48.928Z"
+    },
+    {
+      "id": "672a3dee-535b-4163-833b-961c77c6b57a",
+      "farmer_id": "2a73c9f4-501c-4efb-ad60-fe9b2d2a2652",
+      "crop_name": "Wheat",
+      "sowing_date": "2026-10-20",
+      "variety": "Standard High-Yield Variety",
+      "growth_stage": "Germination & Early Vegetative",
+      "created_at": "2026-11-05T18:14:27.162Z"
     }
   ],
-  "action_plans": [],
-  "chat_history": [],
+  "action_plans": [
+    {
+      "id": "1096f25e-4c07-43b6-b1fe-3e4b6693ae39",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "crop_id": "00000000-0000-0000-0000-000000000003",
+      "plan_date": "2026-11-05",
+      "task_key": "rice_shallow_water",
+      "task_title": "Maintain 2-3 cm Shallow Standing Water",
+      "task_description": "Maintain thin water level across the paddy basins. Do not submerge tillers deeply as shallow water stimulates vigorous tiller emergence.",
+      "reason": "Excess water depth inhibits tiller bud emergence; inadequate water induces weed competition.",
+      "priority": "high",
+      "due_date": "2026-11-05",
+      "completed": false,
+      "source": "ICAR-IIRR Hyderabad Water Management Practices",
+      "created_at": "2026-11-05T17:32:21.101Z"
+    },
+    {
+      "id": "377899bb-b8ff-4b8c-8df1-5177602b4210",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "crop_id": "00000000-0000-0000-0000-000000000003",
+      "plan_date": "2026-11-05",
+      "task_key": "rain_drainage_check",
+      "task_title": "Clear Drainage Outlets & Postpone Foliar Sprays",
+      "task_description": "Heavy precipitation forecast detected (>15mm or >60% probability). Inspect bunds and clear excess water drainage channels.",
+      "reason": "Standing excess water causes root rot; rain washes away freshly sprayed foliar nutrients or crop protectants.",
+      "priority": "high",
+      "due_date": "2026-11-05",
+      "completed": false,
+      "source": "IMD-Agromet Advisory Services",
+      "created_at": "2026-11-05T17:32:21.101Z"
+    },
+    {
+      "id": "8bfef4bd-41af-40c2-b86e-e162ad0f8a12",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "crop_id": "00000000-0000-0000-0000-000000000003",
+      "plan_date": "2026-11-05",
+      "task_key": "scout_foliage",
+      "task_title": "Inspect Foliage for Pest & Disease Symptoms",
+      "task_description": "Walk in a \"W\" pattern across the plot. Check the underside of 15-20 random leaves for discolouration, spots, or egg masses.",
+      "reason": "Early detection of fungal spots, leaf miners, or stem borer entrance holes prevents rapid spread.",
+      "priority": "medium",
+      "due_date": "2026-11-05",
+      "completed": false,
+      "source": "ICAR National Centre for Integrated Pest Management (NCIPM)",
+      "created_at": "2026-11-05T17:32:21.101Z"
+    },
+    {
+      "id": "699ecd90-48f2-4a78-8f51-308b187be3a0",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "crop_id": "00000000-0000-0000-0000-000000000003",
+      "plan_date": "2026-11-05",
+      "task_key": "check_soil_moisture",
+      "task_title": "Check Root Zone Moisture & Soil Friability",
+      "task_description": "Insert a soil probe or finger 5-10 cm deep near root zones. Form a small ball of soil in your palm to check moisture binding.",
+      "reason": "Prevents over-saturation which leads to root hypoxia, while guarding against moisture stress.",
+      "priority": "medium",
+      "due_date": "2026-11-05",
+      "completed": false,
+      "source": "ICAR Directorate of Water Management",
+      "created_at": "2026-11-05T17:32:21.101Z"
+    }
+  ],
+  "chat_history": [
+    {
+      "id": "0b19d073-e090-4b8d-bb9e-c911dba720c3",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "user",
+      "message": "When should I irrigate next?",
+      "created_at": "2026-11-05T18:14:28.752Z"
+    },
+    {
+      "id": "6787cd99-e5b3-41d8-ad48-6727b8928628",
+      "farmer_id": "00000000-0000-0000-0000-000000000001",
+      "role": "assistant",
+      "message": "Hello Ramesh Gowda! Regarding your Rice (Day 35, Seedling Establishment & Early Vegetative):\n\n• Field Focus: Maintain optimal moisture in the root zone. Avoid standing water during non-critical phases.\n• Irrigation & Nutrition: Allow periodic aeration (alternate wetting and drying) to stimulate deep root growth.. Apply scheduled top dressing only when soil is moist and weather is clear.\n• Weather Impact: High rain probability detected in the next 24-48 hours. Consider postponing pesticide/foliar spraying and ensure field drainage channels are clear.\n• Safety Advisory: For any chemical spray, strictly adhere to label instructions and consult your nearest Krishi Vigyan Kendra (KVK) or call the Kisan Call Center (1800-180-1551).\n\nSource: ICAR Agronomic Package of Practices (Verified Fallback)",
+      "created_at": "2026-11-05T18:14:28.752Z"
+    }
+  ],
   "disease_reports": [],
   "farm_expenses": [
     {
@@ -153,5 +262,5 @@
       "created_at": "2026-11-05T10:47:32.102Z"
     }
   ],
-  "last_saved_at": "2026-11-05T11:29:17.085Z"
+  "last_saved_at": "2026-11-05T18:14:28.752Z"
 }

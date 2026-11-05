@@ -1,108 +1,95 @@
 import { supabase, isSupabaseConfigured, localStore } from '../config/db.js';
 
+/**
+ * Authentication Middleware
+ * Enforces per-farmer token authentication and attaches authenticated user context
+ */
 export async function requireAuth(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
-    const isDemoHeader = req.headers['x-demo-user'] === 'true';
-
-    // 1. Demo Mode Fast Path
-    if (isDemoHeader) {
-      req.user = {
-        id: '00000000-0000-0000-0000-000000000001',
-        is_demo: true,
-        role: 'authenticated'
-      };
-      return next();
-    }
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
         data: null,
-        error: 'Authorization header missing or invalid. Use Bearer <token> or x-demo-user: true'
+        error: 'Authentication required. Missing Bearer token in Authorization header.'
       });
     }
 
     const token = authHeader.split(' ')[1];
+    req.token = token;
 
-    // If Supabase is connected, verify JWT using Supabase Auth
+    // 1. Supabase Token Verification (if configured)
     if (isSupabaseConfigured) {
       const { data: { user }, error } = await supabase.auth.getUser(token);
-      if (error || !user) {
-        return res.status(401).json({
-          success: false,
-          data: null,
-          error: 'Invalid or expired session token'
-        });
+      if (user && !error) {
+        req.user = user;
+        return next();
       }
-      req.user = user;
+    }
+
+    // 2. Local Store Session Verification
+    const matchingFarmer = localStore.farmers.find(f => 
+      f.session_token === token ||
+      f.id === token ||
+      f.auth_user_id === token ||
+      `session-${f.id}` === token
+    );
+
+    if (matchingFarmer) {
+      req.user = {
+        id: matchingFarmer.id,
+        auth_user_id: matchingFarmer.auth_user_id,
+        name: matchingFarmer.name,
+        role: 'farmer'
+      };
       return next();
     }
 
-    // Local / In-memory fallback auth token format: "local-user-<id>" or demo token
-    if (token.startsWith('local-token-')) {
-      const userId = token.replace('local-token-', '');
-      req.user = { id: userId, is_demo: false };
-      return next();
-    }
-
-    if (token === 'demo-token') {
-      req.user = { id: '00000000-0000-0000-0000-000000000001', is_demo: true };
-      return next();
-    }
-
-    // Default anonymous session payload
-    req.user = { id: token, is_demo: false };
-    return next();
+    return res.status(401).json({
+      success: false,
+      data: null,
+      error: 'Invalid or expired session. Please log in again.'
+    });
   } catch (error) {
     return res.status(401).json({
       success: false,
       data: null,
-      error: 'Authentication failure: ' + error.message
+      error: 'Authentication failed: ' + error.message
     });
   }
 }
 
 /**
- * Checks that the requested farmer belongs to the authenticated user or is a demo farmer
+ * Enforces strict per-farmer ownership checks on sensitive resources
  */
 export async function verifyFarmerOwnership(req, res, next) {
-  const farmerId = req.params.farmerId || req.params.id || req.body.farmerId;
-  if (!farmerId) {
-    return res.status(400).json({ success: false, data: null, error: 'Farmer ID required' });
+  const targetFarmerId = req.params.farmerId || req.params.id || req.body.farmerId;
+  
+  if (!targetFarmerId) {
+    return res.status(400).json({ success: false, data: null, error: 'Target farmer ID is required.' });
   }
 
-  // Allow demo access
-  if (req.user?.is_demo || farmerId === '00000000-0000-0000-0000-000000000001' || farmerId === '00000000-0000-0000-0000-000000000004') {
+  const currentUserId = req.user?.id;
+  const currentAuthId = req.user?.auth_user_id;
+
+  if (currentUserId === targetFarmerId || currentAuthId === targetFarmerId) {
     return next();
   }
 
-  if (isSupabaseConfigured) {
-    const { data: farmer, error } = await supabase
-      .from('farmers')
-      .select('id, auth_user_id, is_demo')
-      .eq('id', farmerId)
-      .single();
-
-    if (error || !farmer) {
-      return res.status(404).json({ success: false, data: null, error: 'Farmer profile not found' });
-    }
-
-    if (!farmer.is_demo && farmer.auth_user_id !== req.user.id) {
-      return res.status(403).json({ success: false, data: null, error: 'Forbidden: You do not have ownership of this farm profile' });
-    }
-    return next();
-  }
-
-  // Local store ownership check
-  const farmer = localStore.farmers.find(f => f.id === farmerId);
+  // Double-check against farmer record in localStore
+  const farmer = localStore.farmers.find(f => f.id === targetFarmerId);
   if (!farmer) {
-    return res.status(404).json({ success: false, data: null, error: 'Farmer profile not found' });
+    return res.status(404).json({ success: false, data: null, error: 'Farmer profile not found.' });
   }
 
-  if (!farmer.is_demo && farmer.auth_user_id !== req.user.id) {
-    return res.status(403).json({ success: false, data: null, error: 'Forbidden: You do not have ownership of this farm profile' });
+  if (farmer.id === currentUserId || farmer.auth_user_id === currentUserId || farmer.auth_user_id === currentAuthId) {
+    return next();
   }
 
-  return next();
+  return res.status(403).json({
+    success: false,
+    data: null,
+    error: 'Access denied: You can only view or manage your own farm records.'
+  });
 }

@@ -36,3 +36,6 @@ env/
 venv/
 ml_services/.env
 
+# Raw training datasets
+ml_services/data/
+

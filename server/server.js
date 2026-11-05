@@ -17,7 +17,8 @@ import {
   getMarketPrices,
   getCropLifecycle,
   getPestRadar,
-  submitPestReport
+  submitPestReport,
+  lookupLocation
 } from './controllers/agriServicesController.js';
 import {
   compareCrops,
@@ -162,6 +163,7 @@ app.get('/api/crop-lifecycle/:farmerId', requireAuth, verifyFarmerOwnership, get
 // ML Model 4: Geospatial Pest Radar by Location API with Live Alert Map
 app.get('/api/pest-radar', getPestRadar);
 app.post('/api/pest-radar/report', requireAuth, submitPestReport);
+app.get('/api/location/lookup', lookupLocation);
 
 // 8. Agricultural & Community Features
 app.post('/api/crop-comparison', compareCrops);

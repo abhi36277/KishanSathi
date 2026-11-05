@@ -122,12 +122,61 @@ const PLANT_PATHOLOGY_DB = {
 export async function identifyPlantDisease({ cropName = 'rice', symptoms = '', imageBase64 = null, farmerLocation = 'Karnataka' }) {
   const normalizedCrop = cropName.toLowerCase().trim();
   const symptomsLower = symptoms.toLowerCase();
+  const hfToken = process.env.HUGGINGFACE_API_KEY;
 
-  // 1. Try Gemini 1.5 Flash Vision if image is provided and API key is present
+  // 1. Try HuggingFace Deep Learning Plant Disease Vision Model if image and token are provided
+  if (imageBase64 && hfToken && !hfToken.startsWith('your-')) {
+    try {
+      const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+      const imageBuffer = Buffer.from(base64Data, 'base64');
+
+      const hfResp = await fetch('https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${hfToken}`,
+          'Content-Type': 'application/octet-stream'
+        },
+        body: imageBuffer
+      });
+
+      if (hfResp.ok) {
+        const results = await hfResp.json();
+        if (Array.isArray(results) && results.length > 0) {
+          const top = results[0];
+          const rawLabel = (top.label || 'Plant Disease').replace(/___/g, ' - ').replace(/_/g, ' ');
+          const confScore = Math.round((top.score || 0.88) * 100);
+
+          return {
+            success: true,
+            model_used: 'HuggingFace MobileNet-V2 Plant Disease Vision Pipeline',
+            timestamp: new Date().toISOString(),
+            diagnosis: {
+              disease_name: rawLabel,
+              pathogen_type: rawLabel.toLowerCase().includes('healthy') ? 'Healthy Crop' : 'Fungal / Microbial Foliar Pathogen',
+              severity: confScore > 85 ? 'High Risk' : 'Moderate',
+              confidence: confScore,
+              symptoms_identified: `Deep learning computer vision identified visual characteristics typical of ${rawLabel}.`,
+              organic_treatment: 'Spray 5% Neem Seed Kernel Extract (NSKE) or bio-control agent Trichoderma viride @ 5g/L.',
+              cultural_practices: 'Prune severely infected leaves, ensure field aeration, and avoid overhead sprinkler watering.',
+              chemical_guidelines: 'Refer strictly to official package of practices. Consult local Krishi Vigyan Kendra (KVK) for certified fungicides.',
+              kvk_recommendation: `Kisan Call Center: 1800-180-1551 (Toll-Free) or nearest district KVK center in ${farmerLocation}`
+            }
+          };
+        }
+      }
+    } catch (hfErr) {
+      console.warn('HuggingFace vision notice:', hfErr.message);
+    }
+  }
+
+  // 2. Try Gemini Vision if image is provided and API key is present
   if (genAI && imageBase64) {
     try {
-      const model = genAI.getGenerativeModel({ model: modelName });
-      const prompt = `You are a certified agricultural plant pathologist examining this field crop photo.
+      const candModels = [modelName, 'gemini-3.5-flash', 'gemini-flash-latest'].filter(Boolean);
+      for (const m of candModels) {
+        try {
+          const model = genAI.getGenerativeModel({ model: m }, { apiVersion: 'v1beta', timeout: 8000 });
+          const prompt = `You are a certified agricultural plant pathologist examining this field crop photo.
 Crop: ${cropName}
 Location: ${farmerLocation}
 Farmer's Reported Symptoms: "${symptoms || 'Visual examination requested'}"
@@ -146,24 +195,28 @@ Analyze the image carefully. Provide a JSON response matching this schema:
 }
 Do NOT hallucinate unregistered chemicals or exact gram dosages. Focus on practical safety.`;
 
-      const imagePart = {
-        inlineData: {
-          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
-          mimeType: 'image/jpeg'
-        }
-      };
+          const imagePart = {
+            inlineData: {
+              data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+              mimeType: 'image/jpeg'
+            }
+          };
 
-      const result = await model.generateContent([prompt, imagePart]);
-      const text = result.response.text();
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        return {
-          success: true,
-          model_used: `Gemini 1.5 Flash Vision (Computer Vision Pipeline)`,
-          timestamp: new Date().toISOString(),
-          diagnosis: parsed
-        };
+          const result = await model.generateContent([prompt, imagePart]);
+          const text = result.response.text();
+          const jsonMatch = text.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            return {
+              success: true,
+              model_used: `Google Gemini Vision (${m})`,
+              timestamp: new Date().toISOString(),
+              diagnosis: parsed
+            };
+          }
+        } catch (innerErr) {
+          console.warn(`Gemini Vision model ${m} error:`, innerErr.message);
+        }
       }
     } catch (err) {
       console.warn('Gemini Vision API error; falling back to offline agronomic decision tree model:', err.message);

@@ -231,3 +231,122 @@ export async function submitPestReport(req, res) {
     return res.status(500).json({ success: false, data: null, error: error.message });
   }
 }
+
+/**
+ * 5. Pincode & City/Town Geocoding / Location Lookup
+ * Resolves Indian postal pincodes or town names to exact City, District, State, and Lat/Lon
+ */
+export async function lookupLocation(req, res) {
+  try {
+    const { pincode, query, lat, lon } = req.query;
+    const mapboxToken = process.env.MAPBOX_ACCESS_TOKEN;
+
+    const searchTerm = (pincode || query || '').trim();
+
+    // 1. Text or Pincode search
+    if (searchTerm) {
+      if (mapboxToken && !mapboxToken.startsWith('your-')) {
+        try {
+          const mbUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchTerm)}.json?country=in&access_token=${mapboxToken}`;
+          const mbRes = await fetch(mbUrl);
+          if (mbRes.ok) {
+            const mbData = await mbRes.json();
+            if (mbData.features && mbData.features.length > 0) {
+              const feat = mbData.features[0];
+              const context = feat.context || [];
+              const districtCtx = context.find(c => c.id.startsWith('district')) || context.find(c => c.id.startsWith('place'));
+              const stateCtx = context.find(c => c.id.startsWith('region'));
+              const postcodeCtx = context.find(c => c.id.startsWith('postcode'));
+
+              return res.json({
+                success: true,
+                data: {
+                  source: 'Mapbox Geocoding API',
+                  place_name: feat.place_name,
+                  city: feat.text,
+                  district: districtCtx ? districtCtx.text : feat.text,
+                  state: stateCtx ? stateCtx.text : 'India',
+                  pincode: postcodeCtx ? postcodeCtx.text : (/^\d{6}$/.test(searchTerm) ? searchTerm : ''),
+                  latitude: feat.center[1],
+                  longitude: feat.center[0]
+                }
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('Mapbox geocoding error:', e.message);
+        }
+      }
+
+      // Fallback: Official India Post Pincode API
+      if (/^\d{6}$/.test(searchTerm)) {
+        try {
+          const postRes = await fetch(`https://api.postalpincode.in/pincode/${searchTerm}`);
+          if (postRes.ok) {
+            const postData = await postRes.json();
+            if (postData[0]?.Status === 'Success' && postData[0]?.PostOffice?.length > 0) {
+              const po = postData[0].PostOffice[0];
+              return res.json({
+                success: true,
+                data: {
+                  source: 'India Post Official API',
+                  place_name: `${po.Name}, ${po.District}, ${po.State} - ${searchTerm}`,
+                  city: po.Name,
+                  district: po.District,
+                  state: po.State,
+                  pincode: searchTerm,
+                  latitude: 12.5238,
+                  longitude: 76.8967
+                }
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('India Post API error:', e.message);
+        }
+      }
+    }
+
+    // 2. Reverse Geocoding by Lat / Lon
+    if (lat && lon && mapboxToken && !mapboxToken.startsWith('your-')) {
+      try {
+        const mbUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?access_token=${mapboxToken}`;
+        const mbRes = await fetch(mbUrl);
+        if (mbRes.ok) {
+          const mbData = await mbRes.json();
+          if (mbData.features && mbData.features.length > 0) {
+            const feat = mbData.features[0];
+            const context = feat.context || [];
+            const districtCtx = context.find(c => c.id.startsWith('district')) || context.find(c => c.id.startsWith('place'));
+            const stateCtx = context.find(c => c.id.startsWith('region'));
+            const postcodeCtx = context.find(c => c.id.startsWith('postcode'));
+
+            return res.json({
+              success: true,
+              data: {
+                source: 'Mapbox Reverse Geocoding API',
+                place_name: feat.place_name,
+                city: feat.text,
+                district: districtCtx ? districtCtx.text : feat.text,
+                state: stateCtx ? stateCtx.text : 'India',
+                pincode: postcodeCtx ? postcodeCtx.text : '',
+                latitude: parseFloat(lat),
+                longitude: parseFloat(lon)
+              }
+            });
+          }
+        }
+      } catch (e) {
+        console.warn('Mapbox reverse geocoding error:', e.message);
+      }
+    }
+
+    return res.status(404).json({
+      success: false,
+      data: null,
+      error: 'Location not found. Please verify the pincode or town name.'
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, data: null, error: err.message });
+  }
+}

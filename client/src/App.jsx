@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MobileTabBar from './components/MobileTabBar';
@@ -31,26 +32,28 @@ export default function App() {
         <div className="app-container">
           <Navbar />
           <main className="main-content">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegistrationPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/action-plan" element={<ActionPlanPage />} />
-              <Route path="/disease-identification" element={<DiseaseIdentificationPage />} />
-              <Route path="/market-prices" element={<MarketPricesPage />} />
-              <Route path="/crop-lifecycle" element={<CropLifecyclePage />} />
-              <Route path="/pest-radar" element={<PestRadarPage />} />
-              <Route path="/weather" element={<WeatherPage />} />
-              <Route path="/ai-chat" element={<AiAssistantPage />} />
-              <Route path="/crops" element={<CropManagementPage />} />
-              <Route path="/crop-decider" element={<CropComparisonPage />} />
-              <Route path="/expenses" element={<ExpenseLedgerPage />} />
-              <Route path="/field-monitor" element={<FieldMonitorPage />} />
-              <Route path="/schemes" element={<SchemesPage />} />
-              <Route path="/transport" element={<TransportPoolPage />} />
-              <Route path="/community" element={<CommunityPage />} />
-            </Routes>
+            <ErrorBoundary>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegistrationPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/action-plan" element={<ActionPlanPage />} />
+                <Route path="/disease-identification" element={<DiseaseIdentificationPage />} />
+                <Route path="/market-prices" element={<MarketPricesPage />} />
+                <Route path="/crop-lifecycle" element={<CropLifecyclePage />} />
+                <Route path="/pest-radar" element={<PestRadarPage />} />
+                <Route path="/weather" element={<WeatherPage />} />
+                <Route path="/ai-chat" element={<AiAssistantPage />} />
+                <Route path="/crops" element={<CropManagementPage />} />
+                <Route path="/crop-decider" element={<CropComparisonPage />} />
+                <Route path="/expenses" element={<ExpenseLedgerPage />} />
+                <Route path="/field-monitor" element={<FieldMonitorPage />} />
+                <Route path="/schemes" element={<SchemesPage />} />
+                <Route path="/transport" element={<TransportPoolPage />} />
+                <Route path="/community" element={<CommunityPage />} />
+              </Routes>
+            </ErrorBoundary>
           </main>
           <MobileTabBar />
           <Footer />

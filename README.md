@@ -166,17 +166,3 @@ npm run dev         # Launches Vite dev server on http://localhost:5173
 
 ---
 
-## 🎬 3-Minute Hackathon Demo Script
-
-- **[0:00 - 0:30] The Problem**: 
-  *"Small farmers in India struggle because information is scattered. Existing chatbots give generic, dangerous advice like guessing chemical dosages. Today, we present KisanSathi AI."*
-- **[0:30 - 1:00] Language & Hyperlocal Setup**:
-  *Switch language to Kannada or Hindi using the top selector. Click 'Try Interactive Demo'. Point out the loaded farm: Ramesh Gowda, Mandya, 2.5 acres, Rice crop at Day 35 (Tillering Stage), and real Open-Meteo weather.*
-- **[1:00 - 1:45] Signature Action Plan & Adaptive Schedule Recovery**:
-  *Show today's checklist: 'Maintain 2-3 cm Shallow Standing Water' with UAS Bangalore citation. Click 'Could Not Complete Today'. Select 'Heavy unseasonal rain'. Click 'Recalculate Schedule'. Show how the rule engine safely postpones the task, updates the date, and gives an alternative drainage check.*
-- **[1:45 - 2:15] Pre-Planting Crop Comparison**:
-  *Navigate to 'Crop Decider'. Set 1 Acre. Show the direct side-by-side comparison between Tomatoes, Chillies, and Beans (input costs, water, labour days, and net profit).*
-- **[2:15 - 2:45] Grounded Multilingual AI**:
-  *Open AI Assistant. Click suggested question: 'Is it time for second urea top dressing for my rice crop?' Show how the response references the Tillering stage, refuses to give chemical dosages without consulting the label, and attaches the Open-Meteo source citation.*
-- **[2:45 - 3:00] Close**:
-  *"Built in 24 hours with real agricultural data, zero hallucinations, and deep respect for the Indian farmer. Thank you!"*

@@ -292,7 +292,8 @@ export default function DailyPlannerPage() {
                     padding: '5px 10px',
                     fontSize: '0.85rem',
                     fontWeight: 700,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    maxWidth: '100%'
                   }}
                 >
                   {plannerData.all_crops.map(c => (

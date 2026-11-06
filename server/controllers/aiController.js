@@ -33,8 +33,13 @@ export async function chatWithAI(req, res) {
       }
     } else {
       farmer = localStore.farmers.find(f => f.id === farmerId);
-      crop = localStore.crops.filter(c => c.farmer_id === farmerId).pop() || null;
-      farm = localStore.farms.find(f => f.farmer_id === farmerId) || null;
+      const farmerCrops = localStore.crops.filter(c => c.farmer_id === farmerId);
+      crop = farmerCrops.find(c => c.is_active) || farmerCrops[farmerCrops.length - 1] || null;
+      farm = localStore.farms.find(f => f.farmer_id === farmerId) || {};
+      if (crop) {
+        if (crop.area_acres) farm.area_acres = crop.area_acres;
+        if (crop.soil_type) farm.soil_type = crop.soil_type;
+      }
       farmerHistory = (localStore.farmer_crop_history || []).filter(h => h.farmer_id === farmerId).slice(0, 5);
     }
 

@@ -153,26 +153,49 @@ export default function DashboardPage() {
               {farmer?.village ? `${farmer.village}, ` : ''}{farmer?.district}, {farmer?.state}
             </h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem', fontSize: '0.88rem', color: '#e8f5e9', flexWrap: 'wrap' }}>
-              <span>🌱 Main Crop: <strong>{activeCrop?.crop_name || 'Rice (Paddy)'}</strong></span>
-              <span>🌾 Farm Area: <strong>{farmer?.farms?.[0]?.area_acres || 2.5} Acres</strong></span>
-              <span>📅 Sowing Date: <strong>{activeCrop?.sowing_date || 'N/A'}</strong> (Day {daysAfterSowing})</span>
+              <span>🌱 Active Protocol: <strong>{activeCrop?.crop_name || 'Rice (Paddy)'}</strong> ({activeCrop?.plot_name || 'Main Field'})</span>
+              <span>🌾 Area: <strong>{activeCrop?.area_acres || farmer?.farms?.[0]?.area_acres || 2.5} Acres</strong></span>
+              <span>🧱 Soil: <strong>{activeCrop?.soil_type || farmer?.farms?.[0]?.soil_type || 'Red Sandy Loam'}</strong></span>
+              <span>📅 Sown: <strong>{activeCrop?.sowing_date || 'N/A'}</strong> (Day {daysAfterSowing})</span>
             </div>
           </div>
 
-          <Link
-            to="/ai-chat"
-            className="btn-secondary"
-            style={{
-              background: 'white',
-              color: 'var(--primary-green)',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-              padding: '0.6rem 1rem'
-            }}
-          >
-            <Bot size={18} />
-            <span>Chat in Your Language</span>
-          </Link>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <Link
+              to="/crops"
+              style={{
+                background: 'rgba(255,255,255,0.2)',
+                color: 'white',
+                border: '1px solid rgba(255,255,255,0.4)',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                padding: '0.6rem 0.9rem',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              <Sprout size={16} />
+              <span>Plots & Crops</span>
+            </Link>
+
+            <Link
+              to="/ai-chat"
+              className="btn-secondary"
+              style={{
+                background: 'white',
+                color: 'var(--primary-green)',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                padding: '0.6rem 1rem'
+              }}
+            >
+              <Bot size={18} />
+              <span>Chat Assistant</span>
+            </Link>
+          </div>
         </div>
       </div>
 

@@ -126,6 +126,75 @@ const CROP_PROFILES = {
     basal_fertilizer_per_acre: 'DAP 40kg + Single Super Phosphate 50kg (Sulphur)',
     top_dressing_per_acre: 'Urea 25kg at first irrigation (Rosette stage)',
     critical_stages: ['Rosette', 'Flowering']
+  },
+  'onion': {
+    name: 'Onion',
+    total_days: 120,
+    stages: [
+      { name: 'Nursery & Transplanting', days: [0, 20] },
+      { name: 'Vegetative Foliage Growth', days: [21, 50] },
+      { name: 'Bulb Initiation & Swelling', days: [51, 85] },
+      { name: 'Bulb Development & Maturation', days: [86, 105] },
+      { name: 'Neck Fall, Curing & Harvest', days: [106, 120] }
+    ],
+    basal_fertilizer_per_acre: 'DAP 50kg + MOP 30kg + Sulphur 10kg',
+    top_dressing_per_acre: 'Urea 25kg split at 30 & 45 days after transplanting',
+    critical_stages: ['Bulb Initiation', 'Bulb Development']
+  },
+  'soyabean': {
+    name: 'Soyabean',
+    total_days: 95,
+    stages: [
+      { name: 'Germination & Emergence (VE-VC)', days: [0, 10] },
+      { name: 'Vegetative Branching (V1-V4)', days: [11, 30] },
+      { name: 'Flowering & Early Bloom (R1-R2)', days: [31, 50] },
+      { name: 'Pod Development & Seed Filling (R3-R5)', days: [51, 75] },
+      { name: 'Physiological Maturity & Leaf Drop', days: [76, 95] }
+    ],
+    basal_fertilizer_per_acre: 'DAP 40kg + Potash 15kg + Bradyrhizobium seed inoculant',
+    top_dressing_per_acre: 'Foliar spray of 19:19:19 @ 1kg/acre at flowering',
+    critical_stages: ['Flowering', 'Pod Filling']
+  },
+  'gram': {
+    name: 'Bengal Gram / Chana',
+    total_days: 105,
+    stages: [
+      { name: 'Sowing & Seedling Emergence', days: [0, 15] },
+      { name: 'Branching & Vegetative Growth', days: [16, 40] },
+      { name: 'Flower Budding & Bloom', days: [41, 65] },
+      { name: 'Podding & Grain Development', days: [66, 90] },
+      { name: 'Pod Desiccation & Harvest', days: [91, 105] }
+    ],
+    basal_fertilizer_per_acre: 'DAP 40kg + Gypsum 50kg',
+    top_dressing_per_acre: '2% Urea foliar spray at podding',
+    critical_stages: ['Branching', 'Podding']
+  },
+  'groundnut': {
+    name: 'Groundnut / Peanut',
+    total_days: 115,
+    stages: [
+      { name: 'Emergence & Seedling', days: [0, 18] },
+      { name: 'Vegetative Branching', days: [19, 35] },
+      { name: 'Flowering & Peg Initiation', days: [36, 60] },
+      { name: 'Pod Development & Kernal Bulking', days: [61, 95] },
+      { name: 'Maturity & Pulling Harvest', days: [96, 115] }
+    ],
+    basal_fertilizer_per_acre: 'Gypsum 150kg + DAP 35kg + Potash 20kg',
+    top_dressing_per_acre: 'Gypsum 150kg at 40-45 days (Pegging stage)',
+    critical_stages: ['Flowering', 'Pegging', 'Pod Development']
+  },
+  'sugarcane': {
+    name: 'Sugarcane',
+    total_days: 360,
+    stages: [
+      { name: 'Germination & Settling', days: [0, 45] },
+      { name: 'Tillering & Formative Phase', days: [46, 120] },
+      { name: 'Grand Growth & Internode Elongation', days: [121, 270] },
+      { name: 'Ripening & Sucrose Accumulation', days: [271, 360] }
+    ],
+    basal_fertilizer_per_acre: 'SSP 200kg + MOP 50kg + Zinc Sulphate 10kg',
+    top_dressing_per_acre: 'Urea 50kg in 3 equal splits up to 90 days',
+    critical_stages: ['Tillering', 'Grand Growth']
   }
 };
 
@@ -177,17 +246,24 @@ export async function getDailyPlannerAndTracker(req, res) {
       };
     }
 
-    let farm = localStore.farms.filter(f => f.farmer_id === farmerId).pop();
-    if (!farm) {
-      farm = {
-        id: crypto.randomUUID(),
-        farmer_id: farmerId,
-        area_acres: 2.5,
-        soil_type: 'Red Sandy Loam'
-      };
-    }
+    let farm = localStore.farms.filter(f => f.farmer_id === farmerId).pop() || {
+      id: crypto.randomUUID(),
+      farmer_id: farmerId,
+      area_acres: 2.5,
+      soil_type: 'Red Sandy Loam'
+    };
 
-    let crop = localStore.crops.filter(c => c.farmer_id === farmerId).pop();
+    // Retrieve all crops for this farmer and pick requested or active crop
+    if (!localStore.crops) localStore.crops = [];
+    const allCrops = localStore.crops.filter(c => c.farmer_id === farmerId);
+    let crop = null;
+
+    if (req.query.cropId) {
+      crop = allCrops.find(c => c.id === req.query.cropId);
+    }
+    if (!crop) {
+      crop = allCrops.find(c => c.is_active) || allCrops[allCrops.length - 1];
+    }
     if (!crop) {
       const d = new Date();
       d.setDate(d.getDate() - 35);
@@ -197,9 +273,22 @@ export async function getDailyPlannerAndTracker(req, res) {
         crop_name: 'Rice (Paddy)',
         variety: 'Jyothi / Sona Masoori',
         sowing_date: d.toISOString().split('T')[0],
-        growth_stage: 'Tillering'
+        growth_stage: 'Active Tillering',
+        area_acres: 2.5,
+        soil_type: 'Red Sandy Loam',
+        irrigation_type: 'Canal / Flow',
+        plot_name: 'Main Paddy Plot',
+        is_active: true
       };
+      allCrops.push(crop);
+      localStore.crops.push(crop);
+      localStore.save();
     }
+
+    const area = parseFloat(crop.area_acres) || parseFloat(farm.area_acres) || 2.5;
+    const soil = (crop.soil_type || farm.soil_type || 'Red Sandy Loam').trim();
+    const irrigation = crop.irrigation_type || 'Borewell / Canal';
+    const plotName = crop.plot_name || `${crop.crop_name} Plot`;
 
     // 1. Fetch Real-time Open-Meteo Weather
     let weather = null;
@@ -231,7 +320,6 @@ export async function getDailyPlannerAndTracker(req, res) {
     const overallProgressPct = Math.min(100, Math.round((das / profile.total_days) * 100));
 
     // 3. Soil Context Evaluation
-    const soil = (farm.soil_type || 'Red Sandy Loam').trim();
     let soilGuideline = '';
     let soilWaterNeed = 'Normal';
     if (soil.toLowerCase().includes('sandy')) {
@@ -246,7 +334,6 @@ export async function getDailyPlannerAndTracker(req, res) {
     }
 
     // 4. Scale inputs for the farmer's specific acreage
-    const area = parseFloat(farm.area_acres) || 1.0;
     const ureaDoseScaled = `${Math.round(25 * area)} kg total (${25} kg/acre x ${area} acres)`;
     const neemDoseScaled = `${Math.round(1.5 * area * 10) / 10} Litres in ${Math.round(150 * area)}L water`;
 
@@ -440,6 +527,7 @@ export async function getDailyPlannerAndTracker(req, res) {
           district: farmer.district || 'Mandya',
           state: farmer.state || 'Karnataka',
           coordinates: { latitude: lat, longitude: lon },
+          crop_id: crop.id,
           crop_name: crop.crop_name,
           variety: crop.variety || 'Certified Variety',
           sowing_date: crop.sowing_date,
@@ -449,8 +537,12 @@ export async function getDailyPlannerAndTracker(req, res) {
           soil_type: soil,
           soil_water_need: soilWaterNeed,
           soil_guideline: soilGuideline,
-          area_acres: area
+          area_acres: area,
+          irrigation_type: irrigation,
+          plot_name: plotName,
+          is_active: !!crop.is_active
         },
+        all_crops: allCrops,
         weather_telemetry: {
           temperature_c: currentTemp,
           humidity_pct: currentHumidity,

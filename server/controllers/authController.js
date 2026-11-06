@@ -101,6 +101,11 @@ export async function register(req, res) {
       sowing_date: val.sowing_date,
       variety: val.variety || 'Standard High-Yield Variety',
       growth_stage: 'Germination & Early Vegetative',
+      area_acres: val.area_acres || 2.5,
+      soil_type: val.soil_type || 'Red Sandy Loam',
+      irrigation_type: 'Borewell / Canal',
+      plot_name: `${val.crop_name} Main Field`,
+      is_active: true,
       created_at: new Date().toISOString()
     };
 

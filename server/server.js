@@ -8,7 +8,7 @@ import { requireAuth, verifyFarmerOwnership } from './middleware/auth.js';
 import { aiRateLimiter } from './middleware/rateLimiter.js';
 import { register, login, getMe, logout } from './controllers/authController.js';
 import { registerFarmer, getFarmerProfile } from './controllers/farmerController.js';
-import { addCrop, getCropsByFarmer, updateCropStage } from './controllers/cropController.js';
+import { addCrop, getCropsByFarmer, updateCropStage, setActiveCrop, deleteCrop } from './controllers/cropController.js';
 import { fetchWeatherData } from './services/weatherService.js';
 import { getActionPlan, toggleActionPlan, recoverMissedTask } from './controllers/actionPlanController.js';
 import { chatWithAI, getChatHistory, clearChatHistory } from './controllers/aiController.js';
@@ -144,8 +144,11 @@ app.get('/api/farmers/:id', requireAuth, verifyFarmerOwnership, getFarmerProfile
 
 // 4. Crop Management
 app.post('/api/crops', requireAuth, addCrop);
+app.get('/api/crops', requireAuth, (req, res) => { req.params.farmerId = req.user.id; return getCropsByFarmer(req, res); });
 app.get('/api/crops/:farmerId', requireAuth, verifyFarmerOwnership, getCropsByFarmer);
 app.patch('/api/crops/:id', requireAuth, updateCropStage);
+app.post('/api/crops/:id/set-active', requireAuth, setActiveCrop);
+app.delete('/api/crops/:id', requireAuth, deleteCrop);
 
 // 5. Daily Action Plan & Missed-Task Recovery
 app.get('/api/action-plan/:farmerId', requireAuth, verifyFarmerOwnership, getActionPlan);

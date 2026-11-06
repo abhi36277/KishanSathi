@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import apiClient from '../services/api';
 import {
   Calendar, CheckCircle2, Clock, AlertTriangle, Droplets,
   Sprout, Sparkles, Plus, History, ArrowRight, ShieldCheck,
   RefreshCw, CloudRain, Thermometer, Layers, Edit3, X,
-  CheckCircle, ListChecks, Activity, TrendingUp, HelpCircle
+  CheckCircle, ListChecks, Activity, TrendingUp, HelpCircle,
+  MapPin, Check
 } from 'lucide-react';
 
 export default function DailyPlannerPage() {
-  const { farmer, activeCrop } = useApp();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { farmer, activeCrop, switchActiveCrop } = useApp();
 
   const [loading, setLoading] = useState(true);
   const [plannerData, setPlannerData] = useState(null);
@@ -35,12 +39,14 @@ export default function DailyPlannerPage() {
   const [loggingActivity, setLoggingActivity] = useState(false);
 
   const farmerId = farmer?.id || '00000000-0000-0000-0000-000000000001';
+  const urlCropId = searchParams.get('cropId');
 
-  const fetchPlanner = async () => {
+  const fetchPlanner = async (targetCropId = urlCropId) => {
     try {
       setLoading(true);
       setActionError('');
-      const res = await apiClient.get(`/planner/${farmerId}`);
+      const queryParam = targetCropId ? `?cropId=${targetCropId}` : '';
+      const res = await apiClient.get(`/planner/${farmerId}${queryParam}`);
       if (res && res.success && res.data) {
         setPlannerData(res.data);
         const ctx = res.data.farmer_context;
@@ -61,8 +67,16 @@ export default function DailyPlannerPage() {
   };
 
   useEffect(() => {
-    fetchPlanner();
-  }, [farmerId]);
+    fetchPlanner(urlCropId);
+  }, [farmerId, urlCropId]);
+
+  const handleSwitchCrop = async (targetId) => {
+    setSearchParams({ cropId: targetId });
+    if (switchActiveCrop) {
+      switchActiveCrop(targetId);
+    }
+    fetchPlanner(targetId);
+  };
 
   // Toggle checker task
   const handleToggleTask = async (task) => {
@@ -184,6 +198,24 @@ export default function DailyPlannerPage() {
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button
+            onClick={() => navigate('/crops')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: '#fff',
+              border: '1px solid #c8e6c9',
+              color: '#2e7d32',
+              padding: '8px 14px',
+              borderRadius: 8,
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              cursor: 'pointer'
+            }}
+          >
+            <Sprout size={15} /> All Enrolled Plots ({plannerData?.all_crops?.length || 1})
+          </button>
+          <button
             onClick={() => setShowEditContext(true)}
             style={{
               display: 'flex',
@@ -232,13 +264,70 @@ export default function DailyPlannerPage() {
           marginBottom: 20,
           boxShadow: '0 4px 14px rgba(27,94,32,0.18)'
         }}>
+          {/* Active Plot Switcher Dropdown */}
+          {plannerData?.all_crops && plannerData.all_crops.length > 1 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 8,
+              background: 'rgba(0,0,0,0.2)',
+              padding: '8px 12px',
+              borderRadius: 8,
+              marginBottom: 12
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#a5d6a7', textTransform: 'uppercase' }}>
+                  Active Plot Protocol:
+                </span>
+                <select
+                  value={context.crop_id || ''}
+                  onChange={(e) => handleSwitchCrop(e.target.value)}
+                  style={{
+                    background: '#ffffff',
+                    color: '#1b5e20',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '5px 10px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {plannerData.all_crops.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.crop_name} - {c.plot_name || 'Plot'} ({c.area_acres || 2.5} Acres, {c.soil_type || 'Loam'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                onClick={() => navigate('/crops')}
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.4)',
+                  borderRadius: 6,
+                  padding: '4px 10px',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                + Add / Manage Crops
+              </button>
+            </div>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 14 }}>
             <div>
               <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.85, fontWeight: 700 }}>
-                Grounded Farm Context &bull; {context.location}
+                Grounded Farm Context &bull; {context.location} &bull; {context.plot_name || 'Main Plot'}
               </span>
               <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>
-                {context.crop_name} &bull; <span style={{ color: '#a5d6a7' }}>{context.growth_stage}</span> (Day {context.das})
+                {context.crop_name} ({context.variety}) &bull; <span style={{ color: '#a5d6a7' }}>{context.growth_stage}</span> (Day {context.das})
               </div>
             </div>
 

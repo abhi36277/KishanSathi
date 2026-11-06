@@ -23,7 +23,7 @@ export async function callPythonML(path, method = 'GET', body = null) {
         path: url.pathname + url.search,
         method,
         headers: reqHeaders,
-        timeout: 4000
+        timeout: 10000
       }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);

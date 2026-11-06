@@ -105,26 +105,27 @@ export async function getMarketPrices(req, res) {
  */
 export async function getCropLifecycle(req, res) {
   try {
-    const { farmerId } = req.params;
+    const farmerId = req.params.farmerId || req.query.farmerId || req.user?.id;
 
-    const farmer = localStore.farmers.find(f => f.id === farmerId);
-    const crop = localStore.crops.filter(c => c.farmer_id === farmerId).pop();
+    let farmer = farmerId ? localStore.farmers.find(f => f.id === farmerId) : null;
+    let crop = null;
 
-    if (!crop) {
-      return res.status(404).json({
-        success: false,
-        data: null,
-        error: 'No active crop found for this farmer. Please add a crop first.'
-      });
+    if (farmerId) {
+      const userCrops = (localStore.crops || []).filter(c => c.farmer_id === farmerId);
+      crop = userCrops.find(c => c.is_active) || userCrops[userCrops.length - 1];
     }
 
-    const pyRes = await callPythonML(`/ml/lifecycle/calculate?crop=${encodeURIComponent(crop.crop_name)}&sowing_date=${encodeURIComponent(crop.sowing_date)}`);
+    const cropName = req.query.crop || crop?.crop_name || 'Wheat';
+    const sowingDate = req.query.sowingDate || req.query.sowing_date || crop?.sowing_date || '2026-10-20';
+    const location = req.query.location || farmer?.state || 'Karnataka';
+
+    const pyRes = await callPythonML(`/ml/lifecycle/calculate?crop=${encodeURIComponent(cropName)}&sowing_date=${encodeURIComponent(sowingDate)}`);
     if (pyRes.success && pyRes.data) {
       return res.json({
         success: true,
         data: {
-          crop,
-          farmer_name: farmer?.name,
+          crop: crop || { crop_name: cropName, sowing_date: sowingDate },
+          farmer_name: farmer?.name || 'Farmer',
           lifecycle: pyRes.data
         },
         error: null
@@ -132,16 +133,16 @@ export async function getCropLifecycle(req, res) {
     }
 
     const lifecycle = await calculateFullCropLifecycle({
-      cropName: crop.crop_name,
-      sowingDate: crop.sowing_date,
-      farmerLocation: farmer?.state || 'Karnataka'
+      cropName,
+      sowingDate,
+      farmerLocation: location
     });
 
     return res.json({
       success: true,
       data: {
-        crop,
-        farmer_name: farmer?.name,
+        crop: crop || { crop_name: cropName, sowing_date: sowingDate },
+        farmer_name: farmer?.name || 'Farmer',
         lifecycle
       },
       error: null

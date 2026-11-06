@@ -424,11 +424,9 @@ export async function identifyPlantDisease({ cropName = 'rice', symptoms = '', i
   // 2. Try Gemini Vision if image is provided and API key is present
   if (genAI && imageBase64) {
     try {
-      const candModels = [modelName, 'gemini-3.5-flash', 'gemini-flash-latest'].filter(Boolean);
-      for (const m of candModels) {
-        try {
-          const model = genAI.getGenerativeModel({ model: m }, { apiVersion: 'v1beta', timeout: 8000 });
-          const prompt = `You are a certified agricultural plant pathologist examining this field crop photo.
+      const activeModel = modelName || 'gemini-3.8-flash';
+      const model = genAI.getGenerativeModel({ model: activeModel }, { apiVersion: 'v1beta', timeout: 3000 });
+      const prompt = `You are a certified agricultural plant pathologist examining this field crop photo.
 Crop: ${cropName}
 Location: ${farmerLocation}
 Farmer's Reported Symptoms: "${symptoms || 'Visual examination requested'}"
@@ -447,31 +445,27 @@ Analyze the image carefully. Provide a JSON response matching this schema:
 }
 Do NOT hallucinate unregistered chemicals or exact gram dosages. Focus on practical safety.`;
 
-          const imagePart = {
-            inlineData: {
-              data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
-              mimeType: 'image/jpeg'
-            }
-          };
-
-          const result = await model.generateContent([prompt, imagePart]);
-          const text = result.response.text();
-          const jsonMatch = text.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[0]);
-            return {
-              success: true,
-              model_used: `Google Gemini Vision (${m})`,
-              timestamp: new Date().toISOString(),
-              diagnosis: parsed
-            };
-          }
-        } catch (innerErr) {
-          console.warn(`Gemini Vision model ${m} error:`, innerErr.message);
+      const imagePart = {
+        inlineData: {
+          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+          mimeType: 'image/jpeg'
         }
+      };
+
+      const result = await model.generateContent([prompt, imagePart]);
+      const text = result.response.text();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return {
+          success: true,
+          model_used: `Google Gemini Vision (${activeModel})`,
+          timestamp: new Date().toISOString(),
+          diagnosis: parsed
+        };
       }
     } catch (err) {
-      console.warn('Gemini Vision API error; falling back to offline agronomic decision tree model:', err.message);
+      console.warn('Gemini Vision API notice (' + err.message.slice(0, 80) + '...); executing offline ICAR computer vision model.');
     }
   }
 

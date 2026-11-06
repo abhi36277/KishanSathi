@@ -295,91 +295,11 @@ def diagnose_crop_disease(
     symptoms_lower = symptoms.lower()
     api_key = os.getenv("GEMINI_API_KEY", "")
 
-    # 1. Try HuggingFace Deep Learning Plant Disease Model if image & token provided
-    hf_token = os.getenv("HUGGINGFACE_API_KEY", "")
-    if image_base64 and hf_token and not hf_token.startswith("your-"):
-        try:
-            import base64
-            import urllib.request
-            clean_b64 = re.sub(r"^data:image/\w+;base64,", "", image_base64)
-            image_bytes = base64.b64decode(clean_b64)
-
-            req = urllib.request.Request(
-                "https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification",
-                data=image_bytes,
-                headers={
-                    "Authorization": f"Bearer {hf_token}",
-                    "Content-Type": "application/octet-stream"
-                }
-            )
-            with urllib.request.urlopen(req, timeout=6) as resp:
-                if resp.status == 200:
-                    results = json.loads(resp.read().decode())
-                    if isinstance(results, list) and len(results) > 0:
-                        top = results[0]
-                        label = top.get("label", "Plant Pathogen").replace("___", " - ").replace("_", " ")
-                        conf = round(float(top.get("score", 0.88)) * 100)
-                        return {
-                            "success": True,
-                            "pipeline": "Python-HuggingFace-MobileNetV2-Vision",
-                            "timestamp": datetime.now().isoformat(),
-                            "diagnosis": {
-                                "disease_name": label,
-                                "pathogen_type": "Fungal / Microbial Foliar Pathogen",
-                                "severity": "High Risk" if conf > 85 else "Moderate",
-                                "confidence": conf,
-                                "symptoms": f"Deep learning vision identified visual patterns matching {label}.",
-                                "organic_treatment": "Spray 5% Neem Seed Kernel Extract (NSKE) or bio-fungicide Trichoderma viride.",
-                                "cultural_practices": "Prune severely affected foliage and ensure proper field aeration.",
-                                "chemical_guidelines": "Verify approved package of practices. Consult local KVK before chemical spraying.",
-                                "kvk_hotline": "1800-180-1551 (Kisan Call Center)"
-                            }
-                        }
-        except Exception as hf_e:
-            print(f"HuggingFace vision notice: {hf_e}. Falling back to next vision pipeline.")
-
-    # 2. Try Gemini Vision API if key is present and image is provided
-    if api_key and not api_key.startswith("your-") and image_base64 and genai:
-        try:
-            client = genai.Client(api_key=api_key)
-            prompt = (
-                f"You are an expert plant pathologist. Diagnose this {crop_name} crop from {location}. "
-                f"Farmer symptoms: '{symptoms}'. Return ONLY valid JSON: "
-                "{\"disease_name\": \"...\", \"pathogen_type\": \"...\", \"severity\": \"Severe|Moderate|Low\", "
-                "\"confidence\": 88, \"symptoms_identified\": \"...\", \"organic_treatment\": \"...\", "
-                "\"cultural_practices\": \"...\", \"chemical_guidelines\": \"...\", \"kvk_recommendation\": \"...\"}"
-            )
-            clean_b64 = re.sub(r"^data:image/\w+;base64,", "", image_base64)
-            import base64
-            image_bytes = base64.b64decode(clean_b64)
-
-            pref_model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
-            for m in [pref_model, "gemini-3.5-flash", "gemini-flash-latest"]:
-                try:
-                    response = client.models.generate_content(
-                        model=m,
-                        contents=[
-                            prompt,
-                            types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg")
-                        ]
-                    )
-                    match = re.search(r"\{[\s\S]*\}", response.text)
-                    if match:
-                        parsed = json.loads(match.group(0))
-                        return {
-                            "success": True,
-                            "pipeline": f"Python-Gemini-Vision-ML ({m})",
-                            "timestamp": datetime.now().isoformat(),
-                            "diagnosis": parsed
-                        }
-                except Exception as vm_err:
-                    print(f"Gemini Vision model {m} notice: {vm_err}")
-        except Exception as e:
-            # Fall back to offline decision tree
-            print(f"Gemini Vision error: {e}. Executing ICAR heuristic model.")
-
-    # 3. Computer Vision Feature Extractor & Trained PlantVillage Model Inference
+    # 1. Primary Pipeline: Computer Vision Feature Extractor & Trained PlantVillage Model Inference (Fast & Local)
     visual_clues = []
+    pv_prediction = None
+    pv_confidence = 0
+
     if image_base64:
         try:
             import io
@@ -397,11 +317,11 @@ def diagnose_crop_disease(
             white_ratio = float(np.mean((r > 200) & (g > 200) & (b > 200)))
 
             if yellow_ratio > 0.03:
-                visual_clues.extend(["yellow", "yellow rust", "stripe", "chlorosis"])
+                visual_clues.extend(["yellow", "yellow rust", "stripe", "chlorosis", "rust"])
             if brown_ratio > 0.03:
-                visual_clues.extend(["brown", "brown spot", "pustule", "blast", "lesion"])
+                visual_clues.extend(["brown", "brown spot", "pustule", "blast", "lesion", "blight"])
             if white_ratio > 0.06:
-                visual_clues.extend(["white", "white mold", "curl", "puckered"])
+                visual_clues.extend(["white", "white mold", "curl", "puckered", "powdery"])
 
             # Check if trained PlantVillage model artifact is available
             model_file = os.path.join(os.path.dirname(__file__), "plantvillage_model.joblib")
@@ -420,12 +340,49 @@ def diagnose_crop_disease(
                     probs = pv_clf.predict_proba(pv_feats)[0]
                     top_idx = int(np.argmax(probs))
                     pred_label = pv_meta["idx_to_label"].get(str(top_idx), pv_meta["classes"][top_idx])
-                    pred_clean = pred_label.replace("___", " - ").replace("_", " ").lower()
-                    visual_clues.append(pred_clean)
+                    pv_confidence = round(float(probs[top_idx]) * 100)
+                    pv_prediction = pred_label.replace("___", " - ").replace("_", " ")
+                    visual_clues.append(pv_prediction.lower())
                 except Exception as pv_infer_err:
                     print(f"PlantVillage local model notice: {pv_infer_err}")
         except Exception as cv_err:
             print(f"Computer Vision pixel feature extractor notice: {cv_err}")
+
+    # 2. Try Gemini Vision API ONLY if image is provided, key is present and not quota-exhausted
+    if api_key and not api_key.startswith("your-") and image_base64 and genai:
+        try:
+            client = genai.Client(api_key=api_key)
+            prompt = (
+                f"You are an expert plant pathologist. Diagnose this {crop_name} crop from {location}. "
+                f"Farmer symptoms: '{symptoms}'. Return ONLY valid JSON: "
+                "{\"disease_name\": \"...\", \"pathogen_type\": \"...\", \"severity\": \"Severe|Moderate|Low\", "
+                "\"confidence\": 88, \"symptoms_identified\": \"...\", \"organic_treatment\": \"...\", "
+                "\"cultural_practices\": \"...\", \"chemical_guidelines\": \"...\", \"kvk_recommendation\": \"...\"}"
+            )
+            clean_b64 = re.sub(r"^data:image/\w+;base64,", "", image_base64)
+            import base64
+            image_bytes = base64.b64decode(clean_b64)
+
+            pref_model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+            response = client.models.generate_content(
+                model=pref_model,
+                contents=[
+                    prompt,
+                    types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg")
+                ]
+            )
+            match = re.search(r"\{[\s\S]*\}", response.text)
+            if match:
+                parsed = json.loads(match.group(0))
+                return {
+                    "success": True,
+                    "pipeline": f"Python-Gemini-Vision-ML ({pref_model})",
+                    "timestamp": datetime.now().isoformat(),
+                    "diagnosis": parsed
+                }
+        except Exception as e:
+            # Fall back directly to instant local ML model without blocking
+            print(f"Gemini Vision notice ({e}). Using local PlantVillage & ICAR ML engine.")
 
     combined_symptoms = f"{symptoms_lower} {' '.join(visual_clues)}".strip()
 

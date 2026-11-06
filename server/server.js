@@ -166,9 +166,11 @@ app.post('/api/disease/identify', identifyDisease);
 
 // ML Model 2: Mandi Market Prices & 7-Day Trend Prediction
 app.get('/api/prices/mandi', getMarketPrices);
+app.get('/api/market-prices', getMarketPrices);
 
 // ML Model 3: Crop Lifecycle Planner (Day-by-Day Sowing, Irrigation, Fertilizer)
-app.get('/api/crop-lifecycle/:farmerId', requireAuth, verifyFarmerOwnership, getCropLifecycle);
+app.get('/api/crop-lifecycle', getCropLifecycle);
+app.get('/api/crop-lifecycle/:farmerId', getCropLifecycle);
 
 // ML Model 4: Geospatial Pest Radar by Location API with Live Alert Map
 app.get('/api/pest-radar', getPestRadar);

@@ -29,7 +29,7 @@ export default function LandingPage() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', maxWidth: 1040, margin: '0 auto', padding: '0 16px' }}>
       {/* Hero Section */}
       <section style={{
-        background: 'linear-gradient(145deg, #eaf5ec 0%, #ffffff 100%)',
+        background: 'linear-gradient(145deg, var(--primary-green-subtle) 0%, #ffffff 100%)',
         borderRadius: '24px',
         padding: '3rem 1.5rem',
         border: '1px solid var(--border-light)',

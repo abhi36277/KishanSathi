@@ -22,7 +22,8 @@ import {
   DollarSign,
   Radar,
   Truck,
-  FileText
+  FileText,
+  Landmark
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -254,6 +255,20 @@ export default function DashboardPage() {
           <div>
             <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#e65100' }}>Nearby Pest Radar</div>
             <div style={{ fontSize: '0.75rem', color: '#666' }}>GPS outbreak alerts map</div>
+          </div>
+        </Link>
+
+        <Link
+          to="/schemes"
+          className="card"
+          style={{ padding: 14, textDecoration: 'none', color: 'inherit', borderLeft: '4px solid #512da8', display: 'flex', alignItems: 'center', gap: 12 }}
+        >
+          <div style={{ background: '#ede7f6', color: '#512da8', padding: 8, borderRadius: 8 }}>
+            <Landmark size={22} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#512da8' }}>Govt Schemes Hub</div>
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>Subsidies for your crop</div>
           </div>
         </Link>
       </div>

@@ -517,20 +517,142 @@ export async function createCropLossEvidence(req, res) {
 }
 
 /**
- * 8. Hand-Verified Government Schemes & Deadline Notifications
+ * 8. Hand-Verified Government Schemes & Dynamic Farmer Recommendation Engine
  */
 export async function getGovtSchemes(req, res) {
   try {
+    // Reload schemes to catch fresh updates
+    try {
+      const raw = fs.readFileSync(path.join(__dirname, '../data/govtSchemes.json'), 'utf8');
+      schemesData = JSON.parse(raw);
+    } catch (e) {
+      // keep existing schemesData
+    }
+
+    const farmerId = req.query.farmerId || req.user?.id;
+    let farmer = null;
+    let activeCrop = null;
+    let farm = null;
+
+    if (farmerId) {
+      farmer = localStore.farmers.find(f => f.id === farmerId);
+      const userCrops = (localStore.crops || []).filter(c => c.farmer_id === farmerId);
+      activeCrop = userCrops.find(c => c.is_active) || userCrops[userCrops.length - 1];
+      farm = (localStore.farms || []).find(f => f.farmer_id === farmerId);
+    }
+
+    const cropName = (req.query.crop || activeCrop?.crop_name || 'Rice (Paddy)').trim();
+    const areaAcres = parseFloat(req.query.area) || parseFloat(activeCrop?.area_acres) || parseFloat(farm?.area_acres) || 2.5;
+    const soilType = (req.query.soil || activeCrop?.soil_type || farm?.soil_type || 'Red Sandy Loam').trim();
+    const irrigationType = (req.query.irrigation || activeCrop?.irrigation_type || 'Borewell / Tube-well').trim();
+    const farmerState = (req.query.state || farmer?.state || 'Karnataka').trim();
+
+    const isSmallMarginal = areaAcres <= 5.0; // Under 2 hectares
+
+    const evaluatedSchemes = schemesData.map(scheme => {
+      let score = 50;
+      const reasons = [];
+
+      // 1. Check Crop Specific Match
+      const cropList = scheme.applicable_crops || ['All Crops'];
+      const isUniversal = cropList.includes('All Crops');
+      const cropMatch = isUniversal || cropList.some(c => 
+        c.toLowerCase().includes(cropName.toLowerCase()) || 
+        cropName.toLowerCase().includes(c.toLowerCase())
+      );
+
+      if (cropMatch) {
+        if (!isUniversal) {
+          score += 30;
+          reasons.push(`Specifically tailored for ${cropName} cultivation.`);
+        } else {
+          score += 15;
+          reasons.push(`Universal support available for all crop growers including ${cropName}.`);
+        }
+      } else {
+        score -= 20;
+      }
+
+      // 2. Check Landholding / Farm Size
+      if (scheme.landholding_criteria === 'small_marginal') {
+        if (isSmallMarginal) {
+          score += 25;
+          reasons.push(`Your farm size (${areaAcres} Acres) qualifies for priority / enhanced subsidies as a Small & Marginal Farmer (< 5 Acres).`);
+        } else {
+          score -= 15;
+        }
+      } else {
+        score += 10;
+        reasons.push(`Open to all landholding sizes (you cultivate ${areaAcres} Acres).`);
+      }
+
+      // 3. State Match
+      const stateList = scheme.applicable_states || ['All India'];
+      const stateMatch = stateList.includes('All India') || stateList.some(s => s.toLowerCase() === farmerState.toLowerCase());
+      if (stateMatch) {
+        if (!stateList.includes('All India')) {
+          score += 25;
+          reasons.push(`Special state scheme specifically active in ${farmerState}.`);
+        } else {
+          score += 5;
+        }
+      } else {
+        score -= 40; // state mismatch
+      }
+
+      // 4. Irrigation Match
+      const irrList = scheme.irrigation_criteria || ['all'];
+      if (!irrList.includes('all')) {
+        const irrMatch = irrList.some(i => i.toLowerCase().includes(irrigationType.toLowerCase()) || irrigationType.toLowerCase().includes(i.toLowerCase()));
+        if (irrMatch) {
+          score += 20;
+          reasons.push(`Optimized for your ${irrigationType} water system.`);
+        }
+      }
+
+      // Clamp score
+      score = Math.min(99, Math.max(20, score));
+
+      const isRecommended = score >= 70 && stateMatch;
+
+      return {
+        ...scheme,
+        match_score: score,
+        is_recommended: isRecommended,
+        recommendation_reasons: reasons,
+        official_portal: scheme.official_portal || scheme.official_url,
+        official_url: scheme.official_url || scheme.official_portal
+      };
+    });
+
+    // Sort by match_score descending
+    evaluatedSchemes.sort((a, b) => b.match_score - a.match_score);
+
+    const recommended = evaluatedSchemes.filter(s => s.is_recommended);
+
     return res.json({
       success: true,
       data: {
-        schemes: schemesData,
+        farmer_context: {
+          crop_name: cropName,
+          plot_name: activeCrop?.plot_name || 'Main Field',
+          area_acres: areaAcres,
+          soil_type: soilType,
+          irrigation_type: irrigationType,
+          state: farmerState,
+          is_small_marginal: isSmallMarginal
+        },
+        recommended_count: recommended.length,
+        total_schemes: evaluatedSchemes.length,
+        recommended_schemes: recommended,
+        schemes: evaluatedSchemes,
         official_portal_reference: 'https://myscheme.gov.in and https://pmkisan.gov.in',
-        disclaimer: 'Scheme eligibility and benefits are verified against official Government of India notifications. Apply directly via official state and central portals.'
+        disclaimer: 'Scheme eligibility and benefits are verified against official Government of India and State agricultural portals. Apply directly via official external portals.'
       },
       error: null
     });
   } catch (error) {
+    console.error('getGovtSchemes error:', error);
     return res.status(500).json({ success: false, data: null, error: error.message });
   }
 }
